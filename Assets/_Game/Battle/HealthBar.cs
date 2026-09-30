@@ -1,28 +1,25 @@
-﻿using MoreMountains.Tools;
-using TMPro;
-using UniRx;
+﻿using TMPro;
 using UnityEngine;
-using Zenject;
 
-namespace Game
+public sealed class HealthBar : MonoBehaviour
 {
-    // Индикатор здоровья игрока
-    public sealed class HealthBar : MonoBehaviour
+    [SerializeField]
+    private TMP_Text _label;
+
+    [SerializeField]
+    private Transform _bar;
+    
+    private void Update()
     {
-        [SerializeField]
-        private TMP_Text _label;
+        var hp = (float)Stats.Instance.HP;
 
-        [SerializeField]
-        private MMProgressBar _bar;
-
-        [Inject]
-        private void Construct(HealthService healthService)
-        {
-            healthService.GetHealth.Subscribe(value =>
-            {
-                _label.text = $"{value}/{healthService.GetMaxHealth.Value}";
-                _bar.SetBar(value, 0, healthService.GetMaxHealth.Value);
-            });
-        }
+        if (hp < 0)
+            hp = 0;
+        
+        var progress = 1 - hp / Stats.Instance.MaxHP;
+        
+        _label.text = $"{hp}/{Stats.Instance.MaxHP}";
+        _bar.localPosition = new Vector3(Mathf.Lerp(0, -0.5f, progress), _bar.localPosition.y); // -0.5
+        _bar.localScale = new Vector3(Mathf.Lerp(1, 0f, progress), _bar.localScale.y); // 0
     }
 }

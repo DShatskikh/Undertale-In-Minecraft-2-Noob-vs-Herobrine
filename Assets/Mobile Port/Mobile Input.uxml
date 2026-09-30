@@ -1,0 +1,8 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Mobile%20Port/UI.uss?fileID=7433441132597879392&amp;guid=c1692c7d743ff924f807ad54c6637386&amp;type=3#UI" />
+    <ui:VisualElement name="root" style="flex-grow: 1; flex-direction: row;">
+        <ui:VisualElement name="left" style="flex-grow: 1; background-color: rgb(255, 255, 255); flex-shrink: 0; background-image: url(&quot;project://database/Assets/Mobile%20Port/pixel-art-forest-landscape-with-sunlight-sunrise-block-style-environment_1267545-9637.jpg?fileID=2800000&amp;guid=6819368616c3bd445b61e5117c0f1a09&amp;type=3#pixel-art-forest-landscape-with-sunlight-sunrise-block-style-environment_1267545-9637&quot;); background-position-y: center 0; background-position-x: center 0; background-repeat: no-repeat no-repeat; background-size: 679% 100%; -unity-background-image-tint-color: rgb(85, 85, 85);" />
+        <ui:VisualElement name="container" style="flex-grow: 0; width: 1150px;" />
+        <ui:VisualElement name="right" style="flex-grow: 1; background-color: rgb(0, 0, 0); flex-shrink: 0; background-image: url(&quot;project://database/Assets/Mobile%20Port/pixel-art-forest-landscape-with-sunlight-sunrise-block-style-environment_1267545-9637.jpg?fileID=2800000&amp;guid=6819368616c3bd445b61e5117c0f1a09&amp;type=3#pixel-art-forest-landscape-with-sunlight-sunrise-block-style-environment_1267545-9637&quot;); background-size: 679% 100%; background-position-x: right -340px; -unity-background-image-tint-color: rgb(85, 85, 85);" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d412c1a27cec4a17b553dc9939c23894, type: 3}
+  m_Name: Tile Config
+  m_EditorClassIdentifier: 
+  Stone:
+  - {fileID: 11400000, guid: eb1705eb90756d84cb72c9709b73c85c, type: 2}
+  Grass:
+  - {fileID: 11400000, guid: 0d6b4ef52f97fe347a0b2a2402a6ff91, type: 2}
+  Dirt:
+  - {fileID: 11400000, guid: 192df717a6686d548aad2a5a222543ad, type: 2}
+  - {fileID: 11400000, guid: b372cf0a44e0b1b4abadcc5cc650a807, type: 2}
+  - {fileID: 11400000, guid: 9447a6fd23c48a74b99b67735b08d9de, type: 2}
+  - {fileID: 11400000, guid: 9aff7831f78ce184ab374cf3836db260, type: 2}
+  - {fileID: 11400000, guid: a534c287735eb064aa52db3e2ba4cb48, type: 2}
+  - {fileID: 11400000, guid: 57334abcf2d4fcf4b929311aa6f62d89, type: 2}
+  - {fileID: 11400000, guid: 3af5538021c663d458e4f60296bacbad, type: 2}
+  - {fileID: 11400000, guid: f8ce7c6bed186ee4e80f2cddbf79cae7, type: 2}
+  - {fileID: 11400000, guid: d96139de2b063c34392efd75d644d8b6, type: 2}
+  - {fileID: 11400000, guid: e4e2763d98c893149a4eea4f3fd0504d, type: 2}
+  - {fileID: 11400000, guid: e3635ef6cb809624dad0cfd617b18e4c, type: 2}
+  - {fileID: 11400000, guid: 5562775107f329f40ba1f3c02bf32ded, type: 2}
+  Wood: []
+  Sponge: []
+  Sand:
+  - {fileID: 11400000, guid: 18eb3b262ae9c2b46975ff923e9d4913, type: 2}
+  StoneSFX:
+  - {fileID: 8300000, guid: d0804d0f450d1c9479c3ef4d511ee3e0, type: 3}
+  - {fileID: 8300000, guid: fe0c3c1967a56bc42a689552ed1be2f6, type: 3}
+  GrassSFX:
+  - {fileID: 8300000, guid: f880a46722def2e468cc9c77e4d2d60d, type: 3}
+  - {fileID: 8300000, guid: b8918644a2509194993fd57f1faae213, type: 3}
+  DirtSFX:
+  - {fileID: 8300000, guid: 37e56bb65b9ae164dbf011e477c9473d, type: 3}
+  - {fileID: 8300000, guid: 1526bdc2435e0154db87cb048a99fad8, type: 3}
+  WoodSFX:
+  - {fileID: 8300000, guid: 73f3989d14f64c5419dc0f3ba5ad6ce1, type: 3}
+  - {fileID: 8300000, guid: fd6712f05f0fc854d858dfc4b5da44f0, type: 3}
+  SpongeSFX:
+  - {fileID: 8300000, guid: 5d93625eb742e394f9dfc64540089b0f, type: 3}
+  - {fileID: 8300000, guid: c7b57814f08373e458cb42876ec90b9c, type: 3}
+  SandSFX:
+  - {fileID: 8300000, guid: 762bd4de6cf97fc4e85730e3fd98f39d, type: 3}
+  - {fileID: 8300000, guid: bd934b1ad702df343ba8f0c61609c1e6, type: 3}
