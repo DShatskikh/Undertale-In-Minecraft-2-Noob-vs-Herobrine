@@ -4,10 +4,14 @@ using UnityEngine.UIElements;
 
 public sealed class HideScreen : MonoBehaviour
 {
-    private VisualElement _container;
+    public static HideScreen Instance;
     
+    private VisualElement _container;
+
     private void Awake()
     {
+        Instance = this;
+        
         var uiDocument = GetComponent<UIDocument>();
         _container = uiDocument.rootVisualElement.Q<VisualElement>("container");
         DontDestroyOnLoad(gameObject);

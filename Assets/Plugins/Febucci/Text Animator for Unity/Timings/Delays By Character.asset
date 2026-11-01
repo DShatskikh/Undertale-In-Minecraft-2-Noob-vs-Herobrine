@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Delays By Character
   m_EditorClassIdentifier: Febucci.TextAnimator.Runtime::Febucci.TextAnimatorForUnity.TypewriterByCharacter
   waitForNormalChars: 0.03
-  waitLong: 0.6
-  waitMiddle: 0.2
+  waitLong: 0.03
+  waitMiddle: 0.03
   avoidMultiplePunctuationWait: 1
-  waitForNewLines: 1
-  waitForLastCharacter: 1
-  useTypewriterWaitForDisappearances: 1
+  waitForNewLines: 0
+  waitForLastCharacter: 0
+  useTypewriterWaitForDisappearances: 0
   disappearanceWaitTime: 0.015
   disappearanceSpeedMultiplier: 1

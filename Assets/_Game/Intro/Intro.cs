@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Febucci.TextAnimatorForUnity;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,10 +19,14 @@ public sealed class Intro : MonoBehaviour
     
     [SerializeField]
     private GameObject[] _slides;
+
+    [SerializeField]
+    private SpriteRenderer _blackout;
     
     private int _slideIndex = -1;
     
     public int ButtonIndex;
+    private bool _isSkip;
 
     private void Awake()
     {
@@ -36,6 +41,9 @@ public sealed class Intro : MonoBehaviour
 
     private void Update()
     {
+        if (_isSkip)
+            return;
+        
         if (InputManager.Instance.IsSubmitDown)
         {
             if (ButtonIndex == 0)
@@ -68,6 +76,9 @@ public sealed class Intro : MonoBehaviour
 
     public void Next()
     {
+        if (_isSkip)
+            return;
+        
         if (_slideIndex != -1)
             _slides[_slideIndex].SetActive(false);
         
@@ -83,17 +94,17 @@ public sealed class Intro : MonoBehaviour
 
         var message = _slideIndex switch
         {
-            0 => "Курица спасла сервер",
-            1 => "Завела новых друзей",
+            0 => "Однажды Курица спасла сервер.",
+            1 => "Завела новых друзей.",
             2 => "А затем устроил лучшую вечеринку в мире!",
             3 => "Некоторое время до этого...",
-            4 => "Это Нубик он впервые зашел на сервер",
-            5 => "Он построил свой первый дом",
-            6 => "И просто наслаждается жизнью",
+            4 => "Это Нубик он впервые зашел на сервер.",
+            5 => "Он построил свой первый дом.",
+            6 => "И просто наслаждается жизнью.",
             7 => "Но счастье не могло длится вечно...",
-            8 => "Херобрин загриферил домик Нубика",
-            9 => "Потому что Нубик не умел приватить",
-            10 => "И теперь ему предстоит отомстить Херобрину",
+            8 => "Херобрин загриферил домик Нубика.",
+            9 => "Потому что Нубик не умел приватить.",
+            10 => "И теперь ему предстоит отомстить Херобрину.",
         };
         
         _label.ShowText(message);
@@ -102,9 +113,25 @@ public sealed class Intro : MonoBehaviour
 
     public void Skip()
     {
-        Stats.Instance.Position = new Vector3(0.419999838f, -5.69999552f, 0);
+        _isSkip = true;
+        StartCoroutine(AwaitSkip());
+    }
+
+    private IEnumerator AwaitSkip()
+    {
+        Heart.Instance.gameObject.SetActive(false);
+        _blackout.gameObject.SetActive(true);
+        
+        while (_blackout.color.a < 1)
+        {
+            _blackout.color = _blackout.color.AddA(Time.deltaTime);
+            yield return null;
+        }
+
+        Stats.Instance.Data[0] = 1;
+        Stats.Instance.Position = new Vector3(0.419999838f, -0.839999557f, 0);
         Stats.Instance.LevelName = "Home";
-        SceneManager.LoadScene("Overworld");
-        SceneManager.LoadScene("Home", LoadSceneMode.Additive);
+        
+        SwitchingLevel.SwitchingNotWorld();
     }
 }

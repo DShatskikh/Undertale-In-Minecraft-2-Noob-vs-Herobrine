@@ -9,12 +9,14 @@ public sealed class Bisnesman : BannedUsable
     
     [SerializeField]
     private SpriteRenderer _view;
+
+    private float _timer;
     
     protected override void Start()
     {
         _gameObject = _view.gameObject;
         
-        if (Stats.Instance.Data[_id]  == 1)
+        if (Stats.Instance.Data[_id] == 1)
         {
             gameObject.SetActive(false);
             enabled = false;
@@ -23,13 +25,23 @@ public sealed class Bisnesman : BannedUsable
 
     private void Update()
     {
+        var speed = 0.2f;
+        
+        if (_timer > 0)
+        {
+            _timer -= Time.deltaTime;
+            return;
+        }
+        
         if (Vector2.Distance(transform.position, Player.Instance.transform.position) < 5f)
         {
             _view.flipX = transform.position.x > Player.Instance.transform.position.x;
+            _timer = speed;
         }
         else
         {
             _view.flipX = false;
+            _timer = speed;
         }
     }
 
@@ -39,7 +51,7 @@ public sealed class Bisnesman : BannedUsable
         {
             yield return AwaitBan();
         }
-        else
+        else if (Stats.Instance.Data[12] == 0)
         {
             SceneManager.LoadScene("Shop", LoadSceneMode.Single);
         }

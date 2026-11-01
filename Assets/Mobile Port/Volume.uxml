@@ -1,0 +1,12 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Mobile%20Port/UI.uss?fileID=7433441132597879392&amp;guid=c1692c7d743ff924f807ad54c6637386&amp;type=3#UI" />
+    <ui:VisualElement name="root" style="flex-grow: 1; flex-direction: row; right: 0; top: 0; scale: 0.75 0.75; position: absolute;">
+        <ui:Slider value="57.2" high-value="100" show-input-field="false" usage-hints="None" tabindex="0" focusable="false" name="VolumeSlider" style="right: 11px; top: 23px; position: absolute; width: 330px; flex-direction: column; flex-wrap: nowrap; height: 30px;">
+            <ui:VisualElement picking-mode="Ignore" style="flex-grow: 1; left: 9px; position: absolute; top: 8px; height: 14px; width: 312px;">
+                <ui:VisualElement name="Fill" picking-mode="Ignore" style="flex-grow: 1; position: absolute; top: auto; right: auto; width: 152px; height: 100%; background-color: rgb(255, 255, 255); left: 0;" />
+            </ui:VisualElement>
+        </ui:Slider>
+        <ui:Label text="100%" picking-mode="Ignore" name="VolumeLabel" style="color: rgb(255, 255, 255); right: 8px; top: 63px; position: absolute; -unity-font-definition: url(&quot;project://database/Assets/_Game/undertale-attack-font-reversed.ttf?fileID=12800000&amp;guid=c14cd4654787dc549af066cef77a4c17&amp;type=3#undertale-attack-font-reversed&quot;); font-size: 28px;" />
+        <ui:Label text="ГРОМКОСТЬ:" name="Label" picking-mode="Ignore" style="-unity-font-definition: url(&quot;project://database/Assets/_Game/UndertaleFonts.otf?fileID=12800000&amp;guid=a9d9aa734e91e2f4a966ad7d4681ab55&amp;type=3#UndertaleFonts&quot;); top: 65px; right: 133px; position: absolute; color: rgb(255, 255, 255); font-size: 35px; -unity-font-style: bold;" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -5,7 +6,15 @@ public class Savepoint : Usable
 {
     [SerializeField]
     private int _locationIndex;
-    
+
+    private void Start()
+    {
+        if (_locationIndex == 2)
+        {
+            Meta.Instance.IsFoundDungeous = true;
+        }
+    }
+
     public override IEnumerator AwaitUse()
     {
         Player.Instance.enabled = false;

@@ -16,11 +16,11 @@ public sealed class MobArenaSpawn : MonoBehaviour
     {
         Player.Instance.enabled = false;
 
-        yield return SelectWindow.StartSelect("Зайти внутрь?\n(Начнётся бой)", "Да", "Нет");
+        yield return SelectWindow.StartSelect("Войти на Моб-арену?\n(Начнётся бой)", "Да", "Нет");
 
         if (!SelectWindow.IsRight)
         {
-            StartBattleScreen.Transition("Hacker");
+            StartBattleScreen.Transition("Mob Arena");
         }
         else
         {

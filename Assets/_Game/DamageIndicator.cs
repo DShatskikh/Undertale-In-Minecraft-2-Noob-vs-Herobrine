@@ -12,7 +12,7 @@ public sealed class DamageIndicator : MonoBehaviour
     
     public IEnumerator Init(Enemy enemy, int damage)
     {
-        transform.position = enemy.transform.position + new Vector3(0, 1.83f);
+        transform.position = enemy.transform.position.SetY(2.39f); // enemy.transform.position + new Vector3(0, 1.83f);
         _label.text = damage.ToString();
         _label.color = Color.red;
         
@@ -29,10 +29,21 @@ public sealed class DamageIndicator : MonoBehaviour
     private IEnumerator AwaitInit(Enemy enemy, int damage)
     {
         var health = (float)enemy.Health;
+
+        if (health < 0)
+            health = 0;
+        
         var startHealth = health;
         var targetHealth = Mathf.Max(0, startHealth - damage);
-    
+
+        if (targetHealth < 0)
+            targetHealth = 0;
+        
         float animationSpeed = startHealth - targetHealth;
+        
+        float progress = health / enemy.MaxHealth;
+        _healthBar.localScale = new Vector3(Mathf.Lerp(0, 1, progress), 1, 1);
+        _healthBar.localPosition = new Vector2((1 - _healthBar.localScale.x) / -2, 0);
         
         while (health > targetHealth)
         {
@@ -41,7 +52,7 @@ public sealed class DamageIndicator : MonoBehaviour
         
             health = Mathf.Max(health, targetHealth);
         
-            float progress = health / enemy.MaxHealth;
+            progress = health / enemy.MaxHealth;
             _healthBar.localScale = new Vector3(Mathf.Lerp(0, 1, progress), 1, 1);
             _healthBar.localPosition = new Vector2((1 - _healthBar.localScale.x) / -2, 0);
         }

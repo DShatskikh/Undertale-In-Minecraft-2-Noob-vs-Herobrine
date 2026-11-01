@@ -5,6 +5,19 @@ public sealed class Bench : Usable
 {
     public override IEnumerator AwaitUse()
     {
+        if (Stats.Instance.Data[7] == 1)
+        {
+            Player.Instance.enabled = false;
+            
+            yield return DialogueWindow.StartDialogue(new []
+            {
+                "(Ничего не произошло.)",
+            }, false);
+            
+            Player.Instance.enabled = true;
+            yield break;
+        }
+        
         Player.Instance.SetFlex(true);
         Player.Instance.enabled = false;
         Player.Instance.GetComponent<Collider2D>().enabled = false;

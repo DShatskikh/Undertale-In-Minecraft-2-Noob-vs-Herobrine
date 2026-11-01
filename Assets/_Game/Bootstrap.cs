@@ -7,20 +7,28 @@ public class Bootstrap : MonoBehaviour
     private void Awake()
     {
         Application.targetFrameRate = 120;
-
 #if !UNITY_EDITOR
         Stats.Instance = SaveSystem.Load();
         Meta.Instance = SaveSystem.MetaLoad();
 
+        Player.IsLoad = true;
+        
         if (SaveSystem.IsSave())
         {
-            SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+            if (Stats.Instance.Data[1] == 1)
+            {
+                SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+            }
+            else
+            {
+                SwitchingLevel.SwitchingNotWorld(Stats.Instance.LevelName, Stats.Instance.Position);
+            }
         }
         else
         {
             Stats.Instance = Stats.GetDefault();
             Meta.Instance = SaveSystem.MetaLoad();
-            SceneManager.LoadScene("ScreenSaver", LoadSceneMode.Single);
+            SceneManager.LoadScene("Intro", LoadSceneMode.Single);
         }
         
         return;
@@ -29,16 +37,23 @@ public class Bootstrap : MonoBehaviour
         Stats.Instance = Stats.GetDefault();
         Meta.Instance = Meta.GetDefault();
         Player.IsLoad = true;
-        
+        Stats.Instance.LevelName = "Home";
+
         // SceneManager.LoadScene("ScreenSaver", LoadSceneMode.Single);
 
         // Meta.Instance.IsCompleteDemo = true;
         // Stats.Instance.IsGenocide = true;
-        // SceneManager.LoadScene("End Demo", LoadSceneMode.Single);
 
         // Stats.Instance = SaveSystem.Load();
         // Stats.Instance.Data[6] = 1;
-        Stats.Instance.Money = 22;
+        // Stats.Instance.Data[7] = 1;
+        // Stats.Instance.Money = 22;
+
+        // Stats.Instance.Data[5] = 1;
+        // Stats.Instance.Data[31] = 1;
+        // Stats.Instance.Data[32] = 1;
+        // Stats.Instance.Data[33] = 1;
+        
         // SceneManager.LoadScene("Menu", LoadSceneMode.Single);
 
         // Stats.Instance = Stats.GetDefault();
@@ -47,163 +62,47 @@ public class Bootstrap : MonoBehaviour
         // SceneManager.LoadSceneAsync("ScreenSaver",  LoadSceneMode.Additive);
 
         // Meta.Instance.IsCompleteTutorial = true;
+        Meta.Instance.Volume = 25f;
 
-        Stats.Instance.Position = new Vector3(0.540000021f, 0, 0);
-        Stats.Instance.LevelName = "Home";
-        SceneManager.LoadScene("Overworld", LoadSceneMode.Single);
-        SceneManager.LoadScene(Stats.Instance.LevelName, LoadSceneMode.Additive);
+        // Meta.Instance.IsCompleteTutorial = true;
+        // Stats.Instance.Data[2] = 1;
+        // Stats.Instance.Data[5] = 1;
+        // Stats.Instance.Data[31] = 1;
+        // Stats.Instance.Data[32] = 1;
+        // Stats.Instance.Data[33] = 1;
+        // Stats.Instance.Data[34] = 1;
+        // Stats.Instance.Data[35] = 1;
         
-        // SceneManager.LoadScene("Battle", LoadSceneMode.Single);
+        // Meta.Instance.IsEndEvil = true;
+        // Meta.Instance.IsEndOldSpawn = true;
+        // Meta.Instance.IsEndPacifist = true;
+        
+        // Stats.Instance.Position = new Vector3(0f, -1.5f, 0);
+        // Stats.Instance.LevelName = "Home"; // Spawn (-1, 0)
+        // SwitchingLevel.SwitchingNotWorld(Stats.Instance.LevelName, Stats.Instance.Position);
+        
+        SceneManager.LoadScene("Battle", LoadSceneMode.Single);
+
+        // SceneManager.LoadScene("GameOver", LoadSceneMode.Single);
         // SceneManager.LoadScene("Intro", LoadSceneMode.Single);
-        
+        // SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+        // SceneManager.LoadScene("Outro 1", LoadSceneMode.Single);
+
         // SceneManager.LoadScene("Shop", LoadSceneMode.Single);
-
-        Stats.Instance.TryAddItem("Стейк");
-        Stats.Instance.TryAddItem("Стейк");
-        Stats.Instance.TryAddItem("Стейк");
-        Stats.Instance.TryAddItem("Стейк");
-        Stats.Instance.TryAddItem("Стейк");
-        Stats.Instance.TryAddItem("Стейк");
-        Stats.Instance.TryAddItem("Стейк");
-        Stats.Instance.TryAddItem("Стейк");
-
-        // Stats.Instance.LevelName = "Level 1";
-        // var majorZvetkov = Instantiate(Resources.Load<GameObject>("Major Zvetcov"));
-        // SceneManager.MoveGameObjectToScene(majorZvetkov, SceneManager.GetSceneByName("Battle"));
+        
+        // Stats.Instance.TryAddItem("Steak"); // Стейк
+        // Stats.Instance.TryAddItem("Steak");
+        // Stats.Instance.TryAddItem("Steak");
+        // Stats.Instance.TryAddItem("Steak");
+        // Stats.Instance.TryAddItem("Potion"); // Зелье Л.
+        // Stats.Instance.TryAddItem("Potion");
+        // Stats.Instance.TryAddItem("GoldApple"); // Зол.Яблк.
     }
-    
+
     private void Start()
     {
 #if !UNITY_EDITOR
         return;
 #endif
-        
-        // CoroutineRunner.Instance.StartCoroutine(AwaitBattleZvetkov());
-        // CoroutineRunner.Instance.StartCoroutine(AwaitBattleGopnik());
-        // CoroutineRunner.Instance.StartCoroutine(AwaitBattleGopnik_Three());
-        // CoroutineRunner.Instance.StartCoroutine(AwaitStartBattleTrain());
-        // CoroutineRunner.Instance.StartCoroutine(AwaitStartBattleDJNikolay());
-        // CoroutineRunner.Instance.StartCoroutine(AwaitStartBattleAlkash());
-        // CoroutineRunner.Instance.StartCoroutine(AwaitStartBattleNarik());
-        // CoroutineRunner.Instance.StartCoroutine(AwaitStartBattleGopnik_Narik());
-        // CoroutineRunner.Instance.StartCoroutine(AwaitBattleEmpty());
-        // CoroutineRunner.Instance.StartCoroutine(AwaitStartBattleTomara());
-        // CoroutineRunner.Instance.StartCoroutine(AwaitBattleText());
-    }
-
-    private IEnumerator AwaitBattleText()
-    {
-        yield return SceneManager.LoadSceneAsync("Battle", LoadSceneMode.Single);
-        var text = Instantiate(Resources.Load<GameObject>("Enemy Test"));
-        SceneManager.MoveGameObjectToScene(text, SceneManager.GetSceneByName("Battle"));
-    }
-    
-    private IEnumerator AwaitBattleZvetkov()
-    {
-        yield return SceneManager.LoadSceneAsync("Battle", LoadSceneMode.Single);
-        var majorZvetkov = Instantiate(Resources.Load<GameObject>("Major Zvetcov"));
-        SceneManager.MoveGameObjectToScene(majorZvetkov, SceneManager.GetSceneByName("Battle"));
-    }
-    
-    private IEnumerator AwaitStartBattleTrain()
-    {
-        yield return SceneManager.LoadSceneAsync("Battle", LoadSceneMode.Single);
-        var train = Instantiate(Resources.Load<GameObject>("Train"));
-        SceneManager.MoveGameObjectToScene(train, SceneManager.GetSceneByName("Battle"));
-        var background = Instantiate(Resources.Load<GameObject>("Enemy Background"));
-        SceneManager.MoveGameObjectToScene(background, SceneManager.GetSceneByName("Battle"));
-    }
-    
-    private IEnumerator AwaitStartBattleAlkash()
-    {
-        yield return SceneManager.LoadSceneAsync("Battle", LoadSceneMode.Single);
-        var alkash = Instantiate(Resources.Load<GameObject>("Alkash"));
-        SceneManager.MoveGameObjectToScene(alkash, SceneManager.GetSceneByName("Battle"));
-        var background = Instantiate(Resources.Load<GameObject>("Enemy Background"));
-        SceneManager.MoveGameObjectToScene(background, SceneManager.GetSceneByName("Battle"));
-    }
-    
-    private IEnumerator AwaitStartBattleNarik()
-    {
-        yield return SceneManager.LoadSceneAsync("Battle", LoadSceneMode.Single);
-        var narik = Instantiate(Resources.Load<GameObject>("Narik"));
-        SceneManager.MoveGameObjectToScene(narik, SceneManager.GetSceneByName("Battle"));
-        var background = Instantiate(Resources.Load<GameObject>("Enemy Background"));
-        SceneManager.MoveGameObjectToScene(background, SceneManager.GetSceneByName("Battle"));
-    }
-    
-    private IEnumerator AwaitStartBattleGopnik_Narik()
-    {
-        yield return SceneManager.LoadSceneAsync("Battle", LoadSceneMode.Single);
-        
-        var gopnik = Instantiate(Resources.Load<GameObject>("Gopnik"));
-        SceneManager.MoveGameObjectToScene(gopnik, SceneManager.GetSceneByName("Battle"));
-        gopnik.transform.position = new Vector3(-2.8f, gopnik.transform.position.y);
-            
-        var narik = Instantiate(Resources.Load<GameObject>("Narik"));
-        SceneManager.MoveGameObjectToScene(narik, SceneManager.GetSceneByName("Battle"));
-        narik.transform.position = new Vector3(2.8f, narik.transform.position.y);
-            
-        var background = Instantiate(Resources.Load<GameObject>("Enemy Background"));
-        SceneManager.MoveGameObjectToScene(background, SceneManager.GetSceneByName("Battle"));
-    }
-    
-    private IEnumerator AwaitBattleGopnik()
-    {
-        yield return  SceneManager.LoadSceneAsync("Battle",  LoadSceneMode.Single);
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName("Battle"));
-        
-        var gopnik_1 = Instantiate(Resources.Load<GameObject>("Gopnik"));
-        SceneManager.MoveGameObjectToScene(gopnik_1, SceneManager.GetSceneByName("Battle"));
-        gopnik_1.transform.position = new Vector3(0f, gopnik_1.transform.position.y);
-        
-        var background = Instantiate(Resources.Load<GameObject>("Enemy Background"));
-        SceneManager.MoveGameObjectToScene(background, SceneManager.GetSceneByName("Battle"));
-    }
-    
-    private IEnumerator AwaitBattleGopnik_Three()
-    {
-        yield return  SceneManager.LoadSceneAsync("Battle",  LoadSceneMode.Single);
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName("Battle"));
-        
-        var gopnik_1 = Instantiate(Resources.Load<GameObject>("Gopnik"));
-        SceneManager.MoveGameObjectToScene(gopnik_1, SceneManager.GetSceneByName("Battle"));
-        gopnik_1.transform.position = new Vector3(-5f-1.11f, gopnik_1.transform.position.y);
-        
-        var gopnik_2 = Instantiate(Resources.Load<GameObject>("Gopnik"));
-        SceneManager.MoveGameObjectToScene(gopnik_2, SceneManager.GetSceneByName("Battle"));
-        gopnik_2.transform.position = new Vector3(-1.11f, gopnik_2.transform.position.y);
-        
-        var gopnik_3 = Instantiate(Resources.Load<GameObject>("Gopnik"));
-        SceneManager.MoveGameObjectToScene(gopnik_3, SceneManager.GetSceneByName("Battle"));
-        gopnik_3.transform.position = new Vector3(5f-1.11f, gopnik_3.transform.position.y);
-        
-        var background = Instantiate(Resources.Load<GameObject>("Enemy Background"));
-        SceneManager.MoveGameObjectToScene(background, SceneManager.GetSceneByName("Battle"));
-    }
-    
-    private IEnumerator AwaitStartBattleDJNikolay()
-    {
-        yield return SceneManager.LoadSceneAsync("Battle", LoadSceneMode.Single);
-        var train = Instantiate(Resources.Load<GameObject>("DJ Nikolay"));
-        SceneManager.MoveGameObjectToScene(train, SceneManager.GetSceneByName("Battle"));
-        var background = Instantiate(Resources.Load<GameObject>("Boss Background"));
-        SceneManager.MoveGameObjectToScene(background, SceneManager.GetSceneByName("Battle"));
-    }
-    
-    private IEnumerator AwaitStartBattleTomara()
-    {
-        yield return SceneManager.LoadSceneAsync("Battle", LoadSceneMode.Single);
-        var tomara = Instantiate(Resources.Load<GameObject>("Tomara"));
-        SceneManager.MoveGameObjectToScene(tomara, SceneManager.GetSceneByName("Battle"));
-        var background = Instantiate(Resources.Load<GameObject>("Boss Background"));
-        SceneManager.MoveGameObjectToScene(background, SceneManager.GetSceneByName("Battle"));
-    }
-    
-    private IEnumerator AwaitBattleEmpty()
-    {
-        yield return SceneManager.LoadSceneAsync("Battle", LoadSceneMode.Single);
-        var empty = Instantiate(Resources.Load<GameObject>("Empty Enemy"));
-        SceneManager.MoveGameObjectToScene(empty, SceneManager.GetSceneByName("Battle"));
     }
 }

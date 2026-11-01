@@ -1,51 +1,75 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using Febucci.TextAnimatorForUnity;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 public sealed class Shop : MonoBehaviour
 {
     [SerializeField]
     private AudioSource _selectSFX;
-    
+
     [SerializeField]
     private AudioSource _squeakSFX;
-    
+
     [SerializeField]
     private AudioSource _buySFX;
-    
+
     [SerializeField]
     private TypewriterComponent _mainLabel;
 
     [SerializeField]
     private TypewriterComponent _messageLabel;
-    
+
     [SerializeField]
     private TypewriterComponent _buyMessageLabel;
-    
+
     [SerializeField]
     private TypewriterComponent _speakMessageLabel;
+
+    [SerializeField]
+    private TextMeshPro _infoItemLabel;
+    
+    [SerializeField]
+    private TextMeshPro _priceLabel;
     
     [SerializeField]
     private GameObject _main;
-    
+
     [SerializeField]
     private GameObject _buy;
-    
+
     [SerializeField]
     private GameObject _speak;
-    
+
     [SerializeField]
     private GameObject _message;
-    
+
     [SerializeField]
     private GameObject _buyConfirm;
 
+    [SerializeField]
+    private TextButton[] _mainButtons;
+
+    [SerializeField]
+    private TextButton[] _buyButtons;
+
+    [SerializeField]
+    private TextButton[] _buyConfirmButtons;
+
+    [SerializeField]
+    private TextButton[] _speakButtons;
+
+    [SerializeField]
+    private GameObject _maskDreamTrue, _maskDreamFake;
+    
     private bool _isBuy;
     private bool _isNotEnoughMoney;
     private int _previousIndex;
-    
+
     public bool IsMain;
     public int MainIndex;
     public bool IsBuy;
@@ -55,12 +79,63 @@ public sealed class Shop : MonoBehaviour
     public bool IsSpeak;
     public int SpeakIndex;
     public string MessageText;
-    
+
     private void Start()
     {
         Heart.Instance.enabled = false;
         IsMain = true;
         SelectScreen(0);
+
+        if (Stats.Instance.Data[9] == 1)
+        {
+            _buyButtons[2].GetComponent<TextMeshPro>().text = "...-";
+        }
+
+        if (!Meta.Instance.IsEndEvil)
+        {
+            _maskDreamTrue.SetActive(false);
+            _maskDreamFake.SetActive(true);
+        }
+        
+        _mainButtons[0].Click += () => SelectScreen(1);
+        _mainButtons[1].Click += SellSelect;
+        _mainButtons[2].Click += () => SelectScreen(2);
+        _mainButtons[3].Click += () => CoroutineRunner.Instance.StartCoroutine(AwaitExit());
+
+        _buyButtons[0].Click += () =>
+        {
+            BuyIndex = 0;
+            SelectScreen(4);
+        };
+
+        _buyButtons[1].Click += () =>
+        {
+            BuyIndex = 1;
+            SelectScreen(4);
+        };
+
+        _buyButtons[2].Click += () =>
+        {
+            BuyIndex = 2;
+            SelectScreen(4);
+        };
+
+        _buyButtons[3].Click += () =>
+        {
+            BuyIndex = 3;
+            SelectScreen(4);
+        };
+
+        _buyButtons[4].Click += () => SelectScreen(0);
+
+        _buyConfirmButtons[0].Click += () => BuyConfirm(0);
+        _buyConfirmButtons[1].Click += () => BuyConfirm(1);
+
+        _speakButtons[0].Click += () => StartCoroutine(AwaitSpeak(0));
+        _speakButtons[1].Click += () => StartCoroutine(AwaitSpeak(1));
+        _speakButtons[2].Click += () => StartCoroutine(AwaitSpeak(2));
+        _speakButtons[3].Click += () => StartCoroutine(AwaitSpeak(3));
+        _speakButtons[4].Click += () => SelectScreen(0);
     }
 
     private void Buy(string id)
@@ -71,7 +146,7 @@ public sealed class Shop : MonoBehaviour
             "HealthPotion" => 9,
             "GoldApple" => 22,
         };
-        
+
         if (Stats.Instance.Money >= price)
         {
             _isBuy = true;
@@ -80,10 +155,42 @@ public sealed class Shop : MonoBehaviour
         }
         else
         {
-            _isNotEnoughMoney = true; 
+            _isNotEnoughMoney = true;
         }
     }
-    
+
+    private void BuyConfirm(int index = -1)
+    {
+        if (index != -1)
+        {
+            BuyConfirmIndex = index;
+        }
+        
+        if (BuyConfirmIndex == 0)
+        {
+            if (BuyIndex == 0)
+            {
+                Buy("Steak");
+            }
+            else if (BuyIndex == 1)
+            {
+                Buy("HealthPotion");
+            }
+            else if (BuyIndex == 2)
+            {
+                _buyButtons[2].GetComponent<TextMeshPro>().text = "...-";
+                Buy("GoldApple");
+                Stats.Instance.Data[9] = 1;
+            }
+                    
+            SelectScreen(1);
+        }
+        else
+        {
+            SelectScreen(1);
+        }
+    }
+
     private void Update()
     {
         if (IsMain)
@@ -96,9 +203,7 @@ public sealed class Shop : MonoBehaviour
                 }
                 else if (MainIndex == 1)
                 {
-                    MessageText = "Прости, но я ничего не продаю";
-                    SelectScreen(3);
-                    StartCoroutine(AwaitMessage());
+                    SellSelect();
                 }
                 else if (MainIndex == 2)
                 {
@@ -141,6 +246,15 @@ public sealed class Shop : MonoBehaviour
         }
         else if (IsBuy)
         {
+            _infoItemLabel.text = BuyIndex switch
+            {
+                0 => $"+{Stats.GetItemHPText("Steak")}ОЗ",
+                1 => $"+{Stats.GetItemHPText("Potion")}ОЗ",
+                2 => (BuyIndex == 2 && Stats.Instance.Data[9] == 0) ? "Распродано." : "+20 ОЗ и +4 МАКС ОЗ",
+                3 => Meta.Instance.IsEndEvil ? $"+Спидраны\n+Новый контент." : "Нет в наличии.",
+                4 => $"",
+            };
+            
             if (InputManager.Instance.IsSubmitDown)
             {
                 if (BuyIndex == 4)
@@ -149,7 +263,10 @@ public sealed class Shop : MonoBehaviour
                 }
                 else
                 {
-                    SelectScreen(4);
+                    if (BuyIndex == 3 && !Meta.Instance.IsEndEvil)
+                        return;
+                    
+                    SelectScreen(4);  
                 }
             }
             else if (InputManager.Instance.IsCancelDown)
@@ -191,33 +308,13 @@ public sealed class Shop : MonoBehaviour
         {
             if (InputManager.Instance.IsSubmitDown)
             {
-                if (SpeakIndex == 0)
-                {
-                    MessageText = "Реплика 1";
-                    SelectScreen(3);
-                    StartCoroutine(AwaitMessage());
-                }
-                else if (SpeakIndex == 1)
-                {
-                    MessageText = "Реплика 2";
-                    SelectScreen(3);
-                    StartCoroutine(AwaitMessage());
-                }
-                else if (SpeakIndex == 2)
-                {
-                    MessageText = "Реплика 3";
-                    SelectScreen(3);
-                    StartCoroutine(AwaitMessage());
-                }
-                else if (SpeakIndex == 3)
-                {
-                    MessageText = "Реплика 4";
-                    SelectScreen(3);
-                    StartCoroutine(AwaitMessage());
-                }
-                else if (SpeakIndex == 4)
+                if (SpeakIndex == 4)
                 {
                     SelectScreen(0);
+                }
+                else
+                {
+                    StartCoroutine(AwaitSpeak());
                 }
             }
             else if (InputManager.Instance.IsCancelDown)
@@ -259,27 +356,7 @@ public sealed class Shop : MonoBehaviour
         {
             if (InputManager.Instance.IsSubmitDown)
             {
-                if (BuyConfirmIndex == 0)
-                {
-                    if (BuyIndex == 0)
-                    {
-                        Buy("Steak");
-                    }
-                    else if (BuyIndex == 1)
-                    {
-                        Buy("HealthPotion");
-                    }
-                    else if (BuyIndex == 2)
-                    {
-                        Buy("GoldApple");
-                    }
-                    
-                    SelectScreen(1);
-                }
-                else
-                {
-                    SelectScreen(1);
-                }
+                BuyConfirm();
             }
             else if (InputManager.Instance.IsCancelDown)
             {
@@ -314,7 +391,90 @@ public sealed class Shop : MonoBehaviour
             };
         }
     }
-    
+
+    private void SellSelect()
+    {
+        MessageText = "Прости, я только продаю.";
+        SelectScreen(3);
+        StartCoroutine(AwaitMessage());
+    }
+
+    private IEnumerator AwaitSpeak(int index = -1)
+    {
+        // О себе - 
+        // Моб-арена - 
+        // Маска Хакера - 
+        // Секреты -   
+
+        if (index != -1)
+        {
+            SpeakIndex = index;
+        }
+        
+        if (SpeakIndex == 0)
+        {
+            MessageText = "Бизнесмен, предпрениматель, филантроп.*Это всё я."; // Я просто обычный продавец на спавне
+            SelectScreen(3);
+            yield return AwaitMessage();
+            
+            MessageText = "А еще самый скромный игрок сервера.";
+            SelectScreen(3);
+            yield return AwaitMessage();
+        }
+        else if (SpeakIndex == 1)
+        {
+            MessageText = "Там можно заработать $ и потратить у меня в магазине.";
+            SelectScreen(3);
+            yield return AwaitMessage();
+            
+            MessageText = "Не забывай покупать лечилки, иначе ты будешь часто проигрывать.";
+            SelectScreen(3);
+            yield return AwaitMessage();
+        }
+        else if (SpeakIndex == 2)
+        {
+            MessageText = "Говорят что она открывает новый контент и даёт доступ к спидранам.";
+            SelectScreen(3);
+            yield return AwaitMessage();
+            
+            MessageText = "Но каждый сам должен решить готов ли он заплатить такую цену.";
+            SelectScreen(3);
+            yield return AwaitMessage();
+        }
+        else if (SpeakIndex == 3)
+        {
+            if (Meta.Instance.IsFoundCastle)
+            {
+                MessageText = "Изначально там должен был быть спавн, но <color=red>Админу</color> он не понравился.*Поэтому он построил другой.";
+                SelectScreen(3);
+                yield return AwaitMessage();
+                
+                MessageText = "Раньше на старом спавне <color=red>Админ</color> тестировал новые ивенты, предметы и мобов.*Наверное так там оказался тот сильный моб и <color=red>админский предмет</color>.";
+                SelectScreen(3);
+                yield return AwaitMessage();
+            }
+            else
+            {
+                MessageText = "На Старом спавне есть очень <color=yellow>дорогой</color> админский предмет который <color=red>Админ</color> там случайно оставил.";
+                SelectScreen(3);
+                yield return AwaitMessage();
+            
+                MessageText = "Многие игроки пытались его забрать.*Но он охраняется очень сильным мобом.*Поэтому он всё еще там.";
+                SelectScreen(3);
+                yield return AwaitMessage();
+            
+                MessageText = "Но кто знает может у тебя получится.*Удачи.";
+                SelectScreen(3);
+                yield return AwaitMessage();
+
+                MessageText = "(Вы получили новую точку для быстрого перемещения.)";
+                SelectScreen(3);
+                yield return AwaitMessage();
+                Meta.Instance.IsFoundCastle = true;
+            }
+        }
+    }
+
     private void WriteMessageMain(string message)
     {
         _mainLabel.ShowText(message);
@@ -330,6 +490,11 @@ public sealed class Shop : MonoBehaviour
      */
     public void SelectScreen(int index)
     {
+        if (index == 4 && BuyIndex == 2 && Stats.Instance.Data[9] == 1)
+        {
+            return;          
+        }
+        
         if (index != 0)
         {
             IsMain = false;
@@ -366,7 +531,7 @@ public sealed class Shop : MonoBehaviour
         {
             IsMain = true;
             _main.SetActive(true);
-            WriteMessageMain("Это я твой лучший друг!");
+            WriteMessageMain("Привет! Рад видеть тебя в моём магазине.");
             Heart.Instance.gameObject.SetActive(true);
         }
         else if (index == 1)
@@ -381,11 +546,11 @@ public sealed class Shop : MonoBehaviour
             
             if (_isBuy)
             {
-                message = "Спасибо за покупку";
+                message = "Спасибо за покупку.";
             }
             else if (_isNotEnoughMoney)
             {
-                message = "Не хватает денег";
+                message = "Тебе нужно еще поднакопить $.";
             }
             
             _buyMessageLabel.ShowText(message);
@@ -400,7 +565,7 @@ public sealed class Shop : MonoBehaviour
             _speak.SetActive(true);
             _selectSFX.Play();
             
-            _speakMessageLabel.ShowText("Что тебя тревожит?");
+            _speakMessageLabel.ShowText("О чем ты хочешь поговорить?");
             _speakMessageLabel.StartShowingText();
         }
         else if (index == 3)
@@ -415,6 +580,16 @@ public sealed class Shop : MonoBehaviour
             _buyMessageLabel.gameObject.SetActive(false);
             _buyConfirm.SetActive(true);
             _selectSFX.Play();
+
+            var price = BuyIndex switch
+            {
+                0 => "5$",
+                1 => "9$",
+                2 => "22$",
+                3 => "200Ян",
+            };
+            
+            _priceLabel.text = $"Купить за {price}?";
         }
         
         _previousIndex = index;
@@ -441,10 +616,64 @@ public sealed class Shop : MonoBehaviour
 
     private IEnumerator AwaitMessage()
     {
-        _messageLabel.ShowText(MessageText);
-        _messageLabel.StartShowingText();
-        yield return new WaitUntil(() => !_messageLabel.IsShowingText);
+        var createdLabels = new List<TypewriterComponent>();
+        string[] parts = MessageText.Split('*', StringSplitOptions.RemoveEmptyEntries);
+        var currentLabel = _messageLabel;
+        var previousLabel = _messageLabel;
+
+        var isSkip = false;
+        
+        for (var i = 0; i < parts.Length; i++)
+        {
+            var part = parts[i];
+
+            if (i != 0)
+            {
+                currentLabel = Instantiate(previousLabel, transform);
+                currentLabel.StopShowingText();
+                currentLabel.GetComponent<TextMeshPro>().text = null;
+                
+                if (!currentLabel.gameObject.GetComponent<SortingGroup>())
+                    currentLabel.gameObject.AddComponent<SortingGroup>().sortingOrder = 5;
+                
+                createdLabels.Add(currentLabel);
+                var textMesh = previousLabel.GetComponentInChildren<TextMeshPro>();
+
+                currentLabel.transform.position = new Vector3(previousLabel.transform.position.x,
+                    previousLabel.transform.position.y - textMesh.renderedHeight,
+                    previousLabel.transform.position.z); // -1
+
+                currentLabel.GetComponentInChildren<TextMeshPro>().text = string.Empty;
+            }
+
+            previousLabel = currentLabel;
+            currentLabel.ShowText(part);
+            currentLabel.StartShowingText();
+
+            while (currentLabel.IsShowingText)
+            {
+                if (InputManager.Instance.IsCancelDown)
+                {
+                    isSkip = true;
+                }
+
+                if (isSkip)
+                {
+                    currentLabel.SkipTypewriter();
+                }
+                
+                yield return null;
+            }
+        }
+        
+        
         yield return InputManager.Instance.AwaitSubmitDownOrClick();
+        
+        for (int i = 0; i < createdLabels.Count; i++)
+        {
+            Destroy(createdLabels[i].gameObject);
+        }
+        
         SelectScreen(0);
     }
 }

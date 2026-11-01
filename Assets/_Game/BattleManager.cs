@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -49,7 +50,7 @@ public sealed class BattleManager : MonoBehaviour
     private GameObject _runHeart;
     
     [SerializeField]
-    private SpriteRenderer _frame;
+    private Frame _frame;
     
     [SerializeField]
     private SpriteRenderer _blackout;
@@ -65,16 +66,33 @@ public sealed class BattleManager : MonoBehaviour
     
     [SerializeField]
     private AudioSource _damageSFX;
+
+    [SerializeField]
+    private TextMeshPro _pageLabel;
+    
+    [SerializeField]
+    private GameObject _itemHPFrame;
+    
+    [SerializeField]
+    private TextMeshPro _itemHPLabel;
+    
+    [SerializeField]
+    private AudioSource _healthSFX;
+    
+    [SerializeField]
+    private AudioSource _mercySFX;
     
     [Header("Data")]
     public bool IsEnemyTurn;
     public bool IsMain = true;
     public bool IsFightSelect;
+    public bool IsFight;
     public bool IsActSelect;
     public bool IsAct;
     public bool IsItems;
     public bool IsMercy;
     public bool IsRun;
+    public bool IsRunAnimation;
 
     public int ItemsIndex;
     public bool IsKarmaniPage_2;
@@ -90,9 +108,17 @@ public sealed class BattleManager : MonoBehaviour
     public BattleMainText MainText;
     public List<Enemy> Enemies;
     public List<FightLabel> FightEnemyLabels;
+    public List<ActSelectLabel> ActEnemyLabels;
     public List<ActLabel> ActLabels;
     public List<ActLabel> ItemLabels;
     public float Progress;
+    public int Turn;
+    public bool IsAttack => EnemyMessageBox.Instance == null;
+    public Frame GetFrame => _frame;
+    public float ProgressMultiply = 1;
+    
+    public int StartMaxHP;
+    public string[] StartItems;
 
     private void Awake()
     {
@@ -101,6 +127,9 @@ public sealed class BattleManager : MonoBehaviour
 
     private void Start()
     {
+        StartItems = Stats.Instance.Items;
+        StartMaxHP = Stats.Instance.MaxHP;
+        Stats.Instance.HP = Stats.Instance.MaxHP;
         _mercyLabel.Init(2, 0);
         _runLabel.Init(2, 1);
         
@@ -116,9 +145,14 @@ public sealed class BattleManager : MonoBehaviour
 
     private void Update()
     {
-        if (IsEnemyTurn)
+        if (IsEnemyTurn && IsAttack)
         {
-            Progress += Time.deltaTime * 2;
+            Progress += Time.deltaTime * ProgressMultiply;
+
+            if (Stats.Instance.HP <= 0)
+            {
+                SceneManager.LoadScene("GameOver", LoadSceneMode.Single);
+            }
         }
         
         if (IsStartBlackout)
@@ -171,18 +205,18 @@ public sealed class BattleManager : MonoBehaviour
                     MainIndex++;
                     
                     if (MainIndex > 3)
-                        MainIndex = 3;
-                    else
-                        _squeakSFX.Play();
+                        MainIndex = 0;
+                    
+                    _squeakSFX.Play();
                 }
                 else if (InputManager.Instance.Horizontal < 0)
                 {
                     MainIndex--;
                     
                     if (MainIndex < 0)
-                        MainIndex = 0;
-                    else
-                        _squeakSFX.Play();
+                        MainIndex = 3;
+                    
+                    _squeakSFX.Play();
                 }
             }
         
@@ -246,7 +280,53 @@ public sealed class BattleManager : MonoBehaviour
         }
         else if (IsActSelect)
         {
+            if (InputManager.Instance.IsSubmitDown)
+            {
+                if (!Enemies[ActSelectedIndex].IsActive)
+                    return;
+                
+                SelectScreen(5);
+            }
+            else if (InputManager.Instance.IsCancelDown)
+            {
+                SelectScreen(-1);
+            }
+            else if (InputManager.Instance.VerticalDown)
+            {
+                if (InputManager.Instance.Vertical > 0)
+                {
+                    if (ActSelectedIndex == 2)
+                    {
+                        ActSelectedIndex = 1;
+                        _squeakSFX.Play();
+                    }
+                    else if (ActSelectedIndex == 1)
+                    {
+                        ActSelectedIndex = 0;
+                        _squeakSFX.Play();
+                    }
+                }
+                else if (InputManager.Instance.Vertical < 0)
+                {
+                    if (ActSelectedIndex == 0 && Enemies.Count > 1)
+                    {
+                        ActSelectedIndex = 1;
+                        _squeakSFX.Play();
+                    }
+                    else if (ActSelectedIndex == 1 && Enemies.Count > 2)
+                    {
+                        ActSelectedIndex = 2;
+                        _squeakSFX.Play();
+                    }
+                }
+            }
             
+            Heart.Instance.transform.localPosition = ActSelectedIndex switch
+            {
+                0 => new Vector2(-6.54f, -1.09f),
+                1 => new Vector2(-6.54f, -2f),
+                2 => new Vector2(-6.54f, -2.94f)
+            };
         }
         else if (IsAct)
         {
@@ -276,9 +356,19 @@ public sealed class BattleManager : MonoBehaviour
                         ActIndex = 1;
                         _squeakSFX.Play();
                     }
+                    else if (ActIndex == 1)
+                    {
+                        ActIndex = 0;
+                        _squeakSFX.Play();
+                    }
                     else if (ActIndex == 2 && actionsCount > 3)
                     {
                         ActIndex = 3;
+                        _squeakSFX.Play();
+                    }
+                    else if (ActIndex == 3)
+                    {
+                        ActIndex = 2;
                         _squeakSFX.Play();
                     }
                     else if (ActIndex == 4 && actionsCount > 5)
@@ -286,17 +376,37 @@ public sealed class BattleManager : MonoBehaviour
                         ActIndex = 5;
                         _squeakSFX.Play();
                     }
+                    else if (ActIndex == 5)
+                    {
+                        ActIndex = 4;
+                        _squeakSFX.Play();
+                    }
                 }
                 else if (InputManager.Instance.Horizontal < 0)
                 {
-                    if (ActIndex == 1)
+                    if (ActIndex == 0 && actionsCount > 1)
+                    {
+                        ActIndex = 1;
+                        _squeakSFX.Play();
+                    }
+                    else if (ActIndex == 1)
                     {
                         ActIndex = 0;
+                        _squeakSFX.Play();
+                    }
+                    else if (ActIndex == 2 && actionsCount > 3)
+                    {
+                        ActIndex = 3;
                         _squeakSFX.Play();
                     }
                     else if (ActIndex == 3)
                     {
                         ActIndex = 2;
+                        _squeakSFX.Play();
+                    }
+                    else if (ActIndex == 4 && actionsCount > 5)
+                    {
+                        ActIndex = 5;
                         _squeakSFX.Play();
                     }
                     else if (ActIndex == 5)
@@ -369,19 +479,11 @@ public sealed class BattleManager : MonoBehaviour
         }
         else if (IsItems)
         {
-            var allItems = new List<string>();
-                
-            for (int i = 0; i < Stats.Instance.Items.Length; i++)
-            {
-                if (string.IsNullOrEmpty(Stats.Instance.Items[i]))
-                    continue;
-                        
-                allItems.Add(Stats.Instance.Items[i]);
-            }
+            var allItems = GetAllItems();
             
             if (InputManager.Instance.IsSubmitDown)
             {
-                EndTurn();
+                StartCoroutine(AwaitUseItem());
             }
             else if (InputManager.Instance.IsCancelDown)
             {
@@ -391,55 +493,112 @@ public sealed class BattleManager : MonoBehaviour
             {
                 if (InputManager.Instance.Horizontal > 0)
                 {
-                    if (ItemsIndex == 0 && allItems.Count > 1)
+                    if (ItemsIndex == 0 && allItems.Length > 1)
                     {
                         ItemsIndex = 1;
                         _squeakSFX.Play();
                     }
-                    else if (ItemsIndex == 1 && allItems.Count > 6)
+                    else if (ItemsIndex == 1 && allItems.Length > 4)
                     {
-                        ItemsIndex = 6;
+                        ItemsIndex = 4;
                         IsKarmaniPage_2 = true;
                         _squeakSFX.Play();
                     }
-                    else if (ItemsIndex == 2 && allItems.Count > 3)
+                    else if (ItemsIndex == 2 && allItems.Length > 3)
                     {
                         ItemsIndex = 3;
                         _squeakSFX.Play();
                     }
-                    else if (ItemsIndex == 3 && allItems.Count > 6)
+                    else if (ItemsIndex == 3 && allItems.Length > 4)
                     {
-                        ItemsIndex = 6;
+                        ItemsIndex = allItems.Length > 6 ? 6 : 4;
                         IsKarmaniPage_2 = true;
                         _squeakSFX.Play();
                     }
-                    else if (ItemsIndex == 4 && allItems.Count > 5)
+                    else if (ItemsIndex == 4)
                     {
-                        ItemsIndex = 5;
+                        if (allItems.Length > 5)
+                        {
+                            ItemsIndex = 5;
+                        }
+                        else
+                        {
+                            ItemsIndex = 0;
+                            IsKarmaniPage_2 = false;
+                        }
+                        
                         _squeakSFX.Play();
                     }
-                    else if (ItemsIndex == 5 && allItems.Count > 6)
+                    else if (ItemsIndex == 5)
                     {
-                        ItemsIndex = 6;
-                        IsKarmaniPage_2 = true;
+                        ItemsIndex = 0;
+                        IsKarmaniPage_2 = false;
                         _squeakSFX.Play();
                     }
-                    else if (ItemsIndex == 6 && allItems.Count > 7)
+                    else if (ItemsIndex == 6)
                     {
-                        ItemsIndex = 7;
+                        ItemsIndex = allItems.Length > 7 ? 7 : 0;
+                        _squeakSFX.Play();
+                    }
+                    else if (ItemsIndex == 7)
+                    {
+                        ItemsIndex = 2;
+                        IsKarmaniPage_2 = false;
                         _squeakSFX.Play();
                     }
                 }
                 else if (InputManager.Instance.Horizontal < 0)
                 {
-                    if (ItemsIndex == 1)
+                    if (ItemsIndex == 0 && allItems.Length > 4)
+                    {
+                        if (allItems.Length > 5)
+                        {
+                            ItemsIndex = 5;  
+                        }
+                        else
+                        {
+                            ItemsIndex = 4;
+                        }
+                        
+                        IsKarmaniPage_2 = true;
+                        _squeakSFX.Play();
+                    }
+                    else if (ItemsIndex == 1)
                     {
                         ItemsIndex = 0;
+                        _squeakSFX.Play();
+                    }
+                    else if (ItemsIndex == 2 && allItems.Length > 4)
+                    {
+                        if (allItems.Length > 7)
+                        {
+                            ItemsIndex = 7;
+                        }
+                        else if (allItems.Length > 6)
+                        {
+                            ItemsIndex = 6;
+                        }
+                        else if (allItems.Length > 5)
+                        {
+                            ItemsIndex = 5;
+                        }
+                        else
+                        {
+                            ItemsIndex = 4;
+                        }
+                        
+                        IsKarmaniPage_2 = true;
                         _squeakSFX.Play();
                     }
                     else if (ItemsIndex == 3)
                     {
                         ItemsIndex = 2;
+                        _squeakSFX.Play();
+                    }
+                    else if (ItemsIndex == 4)
+                    {
+                        ItemsIndex = 1;
+                        IsKarmaniPage_2 = false;
                         _squeakSFX.Play();
                     }
                     else if (ItemsIndex == 5)
@@ -449,7 +608,7 @@ public sealed class BattleManager : MonoBehaviour
                     }
                     else if (ItemsIndex == 6)
                     {
-                        ItemsIndex = 1;
+                        ItemsIndex = 3;
                         IsKarmaniPage_2 = false;
                         _squeakSFX.Play();
                     }
@@ -464,7 +623,17 @@ public sealed class BattleManager : MonoBehaviour
             {
                 if (InputManager.Instance.Vertical > 0)
                 {
-                    if (ItemsIndex == 2)
+                    if (ItemsIndex == 0 && allItems.Length > 2)
+                    {
+                        ItemsIndex = 2;
+                        _squeakSFX.Play();
+                    }
+                    else if (ItemsIndex == 1 && allItems.Length > 3)
+                    {
+                        ItemsIndex = 3;
+                        _squeakSFX.Play();
+                    }
+                    else if (ItemsIndex == 2)
                     {
                         ItemsIndex = 0;
                         _squeakSFX.Play();
@@ -474,114 +643,102 @@ public sealed class BattleManager : MonoBehaviour
                         ItemsIndex = 1;
                         _squeakSFX.Play();
                     }
-                    else if (ItemsIndex == 4)
+                    else if (ItemsIndex == 4 && allItems.Length > 6)
                     {
-                        ItemsIndex = 2;
+                        ItemsIndex = 6;
                         _squeakSFX.Play();
                     }
-                    else if (ItemsIndex == 5)
+                    else if (ItemsIndex == 5 && allItems.Length > 7)
                     {
-                        ItemsIndex = 3;
+                        ItemsIndex = 7;
+                        _squeakSFX.Play();
+                    }
+                    else if (ItemsIndex == 6)
+                    {
+                        ItemsIndex = 4;
+                        _squeakSFX.Play();
+                    }
+                    else if (ItemsIndex == 7)
+                    {
+                        ItemsIndex = 5;
                         _squeakSFX.Play();
                     }
                 }
                 else if (InputManager.Instance.Vertical < 0)
                 {
-                    if (ItemsIndex == 0 && allItems.Count > 2)
+                    if (ItemsIndex == 0 && allItems.Length > 2)
                     {
                         ItemsIndex = 2;
                         _squeakSFX.Play();
                     }
-                    else if (ItemsIndex == 1 && allItems.Count > 3)
+                    else if (ItemsIndex == 1 && allItems.Length > 3)
                     {
                         ItemsIndex = 3;
                         _squeakSFX.Play();
                     }
-                    else if (ItemsIndex == 2 && allItems.Count > 4)
+                    else if (ItemsIndex == 2 && allItems.Length > 4)
+                    {
+                        ItemsIndex = 0;
+                        _squeakSFX.Play();
+                    }
+                    else if (ItemsIndex == 3 && allItems.Length > 5)
+                    {
+                        ItemsIndex = 1;
+                        _squeakSFX.Play();
+                    }
+                    else if (ItemsIndex == 4 && allItems.Length > 6)
+                    {
+                        ItemsIndex = 6;
+                        _squeakSFX.Play();
+                    }
+                    else if (ItemsIndex == 5 && allItems.Length > 7)
+                    {
+                        ItemsIndex = 7;
+                        _squeakSFX.Play();
+                    }
+                    else if (ItemsIndex == 6)
                     {
                         ItemsIndex = 4;
                         _squeakSFX.Play();
                     }
-                    else if (ItemsIndex == 3 && allItems.Count > 5)
+                    else if (ItemsIndex == 7)
                     {
                         ItemsIndex = 5;
                         _squeakSFX.Play();
                     }
                 }
             }
-
+            
             if (IsKarmaniPage_2 && !IsKarmaniSpawnedPage_2)
             {
-                for (int i = 0; i < ItemLabels.Count; i++)
-                {
-                    Destroy(ItemLabels[i].gameObject);
-                }
-                
-                ItemLabels =  new List<ActLabel>();
-                
-                for (int i = 6; i < allItems.Count; i++)
-                {
-                    var itemLabel = Instantiate(Resources.Load<ActLabel>("Action Label"), _itemsScreen.transform);
-                    itemLabel.Init(1, i);
-                    ItemLabels.Add(itemLabel);
-                    
-                    ItemLabels[i - 6].transform.localPosition = i switch
-                    {
-                        6 => new Vector2(-2f, 0.97f),
-                        7 => new Vector2(4.3f, 0.97f)
-                    };
-                    
-                    ItemLabels[i - 6].Label.text = Stats.Instance.Items[i];
-                }
-                
-                IsKarmaniSpawnedPage_2 = true;
+                OpenItems();
             }
             else if (!IsKarmaniPage_2 && IsKarmaniSpawnedPage_2)
             {
-                for (int i = 0; i < ItemLabels.Count; i++)
-                {
-                    Destroy(ItemLabels[i].gameObject);
-                }
-                
-                ItemLabels =  new List<ActLabel>();
-                
-                for (int i = 0; i < 6; i++)
-                {
-                    var itemLabel = Instantiate(Resources.Load<ActLabel>("Action Label"), _itemsScreen.transform);
-                    itemLabel.Init(1, i);
-                    ItemLabels.Add(itemLabel);
-                    
-                    ItemLabels[i].transform.localPosition = i switch
-                    {
-                        0 => new Vector2(-2f, 0.97f),
-                        1 => new Vector2(4.3f, 0.97f),
-                        2 => new Vector2(-2f, 0.05f),
-                        3 => new Vector2(4.3f, 0.05f),
-                        4 => new Vector2(-2f, -0.88f),
-                        5 => new Vector2(4.3f, -0.88f)
-                    };
-                    
-                    ItemLabels[i].Label.text = Stats.Instance.Items[i];
-                }
-                
-                IsKarmaniSpawnedPage_2 = false;
+                OpenItems();
             }
 
+            var hp = Stats.GetItemHPText(allItems[ItemsIndex]);
+            _itemHPLabel.text = $"+{hp}ОЗ";
+            
             Heart.Instance.transform.localPosition = ItemsIndex switch
             {
                 0 => new Vector2(-6.54f, -1.09f),
                 1 => new Vector2(-0.26f, -1.09f),
                 2 => new Vector2(-6.54f, -2f),
                 3 => new Vector2(-0.26f, -2f),
-                4 => new Vector2(-6.54f, -2.94f),
-                5 => new Vector2(-0.26f, -2.94f),
-                6 => new Vector2(-6.54f, -1.09f),
-                7 => new Vector2(-0.26f, -1.09f),
+                4 => new Vector2(-6.54f, -1.09f),
+                5 => new Vector2(-0.26f, -1.09f),
+                6 => new Vector2(-6.54f, -2f),
+                7 => new Vector2(-0.26f, -2f),
                 _ => new Vector2(-6.54f, -1.09f)
             };
         }
         else if (IsMercy)
         {
+            if (IsRunAnimation)
+                return;
+            
             if (InputManager.Instance.IsSubmitDown)
             {
                 EndTurn();
@@ -594,7 +751,12 @@ public sealed class BattleManager : MonoBehaviour
             {
                 if (InputManager.Instance.Vertical > 0)
                 {
-                    if (MercyIndex == 1)
+                    if (MercyIndex == 0 && IsRun)
+                    {
+                        MercyIndex = 1;
+                        _squeakSFX.Play();
+                    }
+                    else if (MercyIndex == 1)
                     {
                         MercyIndex = 0;
                         _squeakSFX.Play();
@@ -607,6 +769,11 @@ public sealed class BattleManager : MonoBehaviour
                         MercyIndex = 1;
                         _squeakSFX.Play();
                     }
+                    else if (MercyIndex == 1)
+                    {
+                        MercyIndex = 0;
+                        _squeakSFX.Play();
+                    }
                 }
             }
             
@@ -616,8 +783,173 @@ public sealed class BattleManager : MonoBehaviour
                 1 => new Vector2(-6.54f, -2.08f),
             };
         }
+
+#if UNITY_EDITOR
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            foreach (var enemy in Enemies)
+            {
+                enemy.Relationship = 20;
+            }
+        }
+#endif
     }
 
+    private string[] GetAllItems()
+    {
+        var allItems = new List<string>();
+
+        for (int i = 0; i < Stats.Instance.Items.Length; i++)
+        {
+            if (!string.IsNullOrEmpty(Stats.Instance.Items[i]))
+            {
+                allItems.Add(Stats.Instance.Items[i]);
+            }
+        }
+        
+        allItems.Add("Ads"); // Реклама
+        return allItems.ToArray();
+    }
+    
+    private void OpenItems()
+    {
+        var allItems = GetAllItems();
+        
+        if (IsKarmaniPage_2)
+        {
+            _pageLabel.text = "СТР 2";
+            for (int i = 0; i < ItemLabels.Count; i++)
+            {
+                Destroy(ItemLabels[i].gameObject);
+            }
+                
+            ItemLabels =  new List<ActLabel>();
+                
+            for (int i = 4; i < allItems.Length; i++)
+            {
+                var itemLabel = Instantiate(Resources.Load<ActLabel>("Action Label"), _itemsScreen.transform);
+                itemLabel.Init(1, i);
+                ItemLabels.Add(itemLabel);
+                    
+                ItemLabels[i - 4].transform.localPosition = i switch
+                {
+                    4 => new Vector2(-2f, 0.97f),
+                    5 => new Vector2(4.3f, 0.97f),
+                    6 => new Vector2(-2f, 0.05f),
+                    7 => new Vector2(4.3f, 0.05f)
+                };
+                    
+                ItemLabels[i - 4].Label.text = Stats.GetItemName(allItems[i]);;
+            }
+                
+            IsKarmaniSpawnedPage_2 = true;
+        }
+        else
+        {
+            _pageLabel.text = "СТР 1";
+            for (int i = 0; i < ItemLabels.Count; i++)
+            {
+                Destroy(ItemLabels[i].gameObject);
+            }
+                
+            ItemLabels =  new List<ActLabel>();
+            var count = allItems.Length;
+                
+            if (count > 4)
+                count = 4;
+                
+            for (int i = 0; i < count; i++)
+            {
+                var itemLabel = Instantiate(Resources.Load<ActLabel>("Action Label"), _itemsScreen.transform);
+                itemLabel.Init(1, i);
+                ItemLabels.Add(itemLabel);
+                    
+                ItemLabels[i].transform.localPosition = i switch
+                {
+                    0 => new Vector2(-2f, 0.97f),
+                    1 => new Vector2(4.3f, 0.97f),
+                    2 => new Vector2(-2f, 0.05f),
+                    3 => new Vector2(4.3f, 0.05f)
+                };
+                    
+                ItemLabels[i].Label.text = Stats.GetItemName(allItems[i]);
+            }
+                
+            IsKarmaniSpawnedPage_2 = false;
+        }
+    }
+
+    private IEnumerator AwaitUseItem()
+    {
+        var activeItems = 0;
+
+        foreach (var item1 in Stats.Instance.Items)
+        {
+            if (!string.IsNullOrEmpty(item1))
+            {
+                activeItems++;
+            }
+        }
+        
+        var item = GetAllItems()[ItemsIndex];
+        Stats.Instance.RemoveItem(item);
+        
+        SelectScreen(-99);
+        Heart.Instance.gameObject.SetActive(false);
+        // По какой-то причине вы восстановили ОЗ.
+
+        var itemName = Stats.GetItemName(item);
+        
+        if (item == "Ads")
+        {
+            itemName = "Рекламу";
+        }
+        
+        var message = $"Вы использовали <Color=\"yellow\">{itemName}</Color>.";
+
+        if (item != "Ads")
+        {
+            message += ((Stats.Instance.HP + Stats.GetItemHP(item) >= Stats.Instance.MaxHP)
+                ? "*Вы восстановили всё ОЗ."
+                : $"*Вы восстановили <Color=\"yellow\">{Stats.GetItemHPText(item)}</Color>ОЗ.");
+        }
+        else
+        {
+            Stats.Instance.MaxHP += 2;
+            
+            message += ((Stats.Instance.HP + Stats.GetItemHP(item) >= Stats.Instance.MaxHP)
+                ? "*По какой-то причине вы восстановили всё ОЗ."
+                : $"*По какой-то причине вы  восстановили <Color=\"yellow\">{Stats.GetItemHPText(item)}</Color>ОЗ.");
+        }
+        
+        if (item == "GoldApple")
+        {
+            Stats.Instance.MaxHP += 4;
+            message += "*И даже больше.";
+        }
+        
+        Health(Stats.GetItemHP(item));
+        
+        yield return MainText.AwaitWrite(message);
+        
+        Heart.Instance.gameObject.SetActive(true);
+        SelectScreen(-1);
+
+        yield return null;
+    }
+
+    public void Health(int health)
+    {
+        var difference = Stats.Instance.MaxHP - Stats.Instance.HP;
+        var add = Mathf.Min(difference, health);
+        
+        if (add < 0)
+            add = 0;
+        
+        Stats.Instance.HP += add;
+        _healthSFX.Play();
+    }
+    
     public void WriteMessage(string message)
     {
         MainText.gameObject.SetActive(true);
@@ -641,7 +973,7 @@ public sealed class BattleManager : MonoBehaviour
         
         if ((index == 0 && IsFightSelect) 
             || (index == 1 && IsActSelect) 
-            ||  (index == 2 && IsItems) 
+            //||  (index == 2 && IsItems) 
             || (index == 3 && IsMercy)
             || (index == -1 && IsMain)
             || (index == 5 && IsAct))
@@ -660,7 +992,8 @@ public sealed class BattleManager : MonoBehaviour
 
             for (int i = 0; i < FightEnemyLabels.Count; i++)
             {
-                Destroy(FightEnemyLabels[i].gameObject);
+                if (FightEnemyLabels[i])
+                    Destroy(FightEnemyLabels[i].gameObject);
             }
             
             FightEnemyLabels =  new List<FightLabel>();
@@ -670,9 +1003,17 @@ public sealed class BattleManager : MonoBehaviour
         {
             IsActSelect = false;
             _actSelectScreen.SetActive(false);
+            
+            for (int i = 0; i < ActEnemyLabels.Count; i++)
+            {
+                if (ActEnemyLabels[i])
+                    Destroy(ActEnemyLabels[i].gameObject);
+            }
+            
+            ActEnemyLabels =  new List<ActSelectLabel>();
         }
         
-        if (index != 2)
+        if (index != 2 || (IsItems))
         {
             IsItems = false;
             _itemsScreen.SetActive(false);
@@ -742,61 +1083,38 @@ public sealed class BattleManager : MonoBehaviour
             IsActSelect = true;
             _actSelectScreen.SetActive(true);
             _selectSFX.Play();
+            
+            for (int i = 0; i < Enemies.Count; i++)
+            {
+                if (!Enemies[i].IsActive)
+                {
+                    ActEnemyLabels.Add(null);
+                    continue;
+                }
+                        
+                ActEnemyLabels.Add(Instantiate(Resources.Load<ActSelectLabel>("Act Select Label"),
+                    _actSelectScreen.transform));
+                    
+                ActEnemyLabels[i].transform.localPosition = i switch
+                {
+                    0 => new Vector2(-2.1f, 0.97f),
+                    1 => new Vector2(-2.1f, 0.05f),
+                    2 => new Vector2(-2.1f, -0.88f)
+                };
+                    
+                ActEnemyLabels[i].Label.text = Enemies[i].Name;
+                ActEnemyLabels[i].SetHealth(i, Enemies[i].Health, Enemies[i].MaxHealth, Enemies[i].Relationship >= 0);
+            }
         }
         else if (index == 2)
         {
             IsItems = true;
             _itemsScreen.SetActive(true);
             _selectSFX.Play();
-            
-            var itemIndex = 0;
-            var itemsCount = 0;
-
-            foreach (var item in Stats.Instance.Items)
-            {
-                if (string.IsNullOrEmpty(item))
-                    continue;
-
-                itemsCount++;
-            }
-                    
-            var items = new string[itemsCount];
-            var j = 0;
-                    
-            foreach (var item in Stats.Instance.Items)
-            {
-                if (string.IsNullOrEmpty(item))
-                    continue;
-                        
-                items[j] = item;
-                j++;
-            }
-
-            for (int i = 0; i < items.Length; i++)
-            {
-                if (string.IsNullOrEmpty(items[i]))
-                    continue;
-                        
-                if (itemIndex >= 6)
-                    continue;
-
-                var itemLabel = Instantiate(Resources.Load<ActLabel>("Action Label"), _itemsScreen.transform);
-                itemLabel.Init(1, i);
-                ItemLabels.Add(itemLabel);
-                    
-                ItemLabels[i].transform.localPosition = itemIndex switch
-                {
-                    0 => new Vector2(-2f, 0.97f),
-                    1 => new Vector2(4.3f, 0.97f),
-                    2 => new Vector2(-2f, 0.05f),
-                    3 => new Vector2(4.3f, 0.05f),
-                    4 => new Vector2(-2f, -0.88f),
-                    5 => new Vector2(4.3f, -0.88f),
-                };
-                    
-                ItemLabels[i].Label.text = items[i];
-                itemIndex++;
-            }
+            IsKarmaniPage_2 = false;
+            IsKarmaniSpawnedPage_2 = false;
+            ItemsIndex = 0;
+            OpenItems();
         }
         else if (index == 3)
         {
@@ -841,7 +1159,7 @@ public sealed class BattleManager : MonoBehaviour
             _actScreen.SetActive(true);
             _selectSFX.Play();
             
-            for (int i = 0; i < Enemies[0].Actions.Count; i++)
+            for (int i = 0; i < Enemies[ActSelectedIndex].Actions.Count; i++)
             {
                 var actLabel = Instantiate(Resources.Load<ActLabel>("Action Label"), _actScreen.transform);
                 actLabel.Init(0, i);
@@ -857,16 +1175,28 @@ public sealed class BattleManager : MonoBehaviour
                     5 => new Vector2(4.3f, -0.88f),
                 };
                     
-                ActLabels[i].Label.text = Enemies[0].Actions[i];
+                ActLabels[i].Label.text = Enemies[ActSelectedIndex].Actions[i];
             }
 
             SelectScreenIndex = 1;
         }
     }
 
-    private void HideButtons()
+    public void HideButtons(bool isSkip = false)
     {
-        StartCoroutine(AwaitHideButtons());
+        if (isSkip)
+        {
+            foreach (var button in _mainButtons)
+            {
+                button.enabled = false;
+            }
+            
+            _mainButtonsContainer.position = _mainButtonsContainer.position.SetY(-1.55f);
+        }
+        else
+        {
+            StartCoroutine(AwaitHideButtons());
+        }
     }
 
     private IEnumerator AwaitHideButtons()
@@ -893,6 +1223,7 @@ public sealed class BattleManager : MonoBehaviour
 
     private IEnumerator AwaitFight()
     {
+        IsFight = true;
         Heart.Instance.gameObject.SetActive(false);
         _targetAnimator.gameObject.SetActive(true);
         _targetAnimator.Play("Target_Intro");
@@ -906,12 +1237,14 @@ public sealed class BattleManager : MonoBehaviour
         
         while (isMoveStick)
         {
+            var TARGET_X = 8.4f;
+            
             yield return null;
             _stickAnimator.transform.localPosition = Vector2.MoveTowards(
-                _stickAnimator.transform.localPosition, new Vector2(7.47f, 0), 
+                _stickAnimator.transform.localPosition, new Vector2(TARGET_X, 0), 
                 Time.deltaTime * 10);
 
-            if (_stickAnimator.transform.localPosition.x >= 7.47f)
+            if (_stickAnimator.transform.localPosition.x >= TARGET_X)
             {
                 isMoveStick = false;
             }
@@ -952,15 +1285,26 @@ public sealed class BattleManager : MonoBehaviour
         var at = 0;
         var weaponPower = 1;
         var defence = 0;
-        var random = Random.Range(0, 3);
-        var damage = (int)((at + weaponPower - defence + random) * coefficientAccuracy);
+        var random = 0;
+        var damage = (int)((at + weaponPower - defence + random) * coefficientAccuracy + 4f);
         
         if (Enemies[FightSelectIndex].Relationship >= 0 && damage < Enemies[FightSelectIndex].Health)
         {
             damage = Enemies[FightSelectIndex].Health;
         }
+
+        if (Enemies[FightSelectIndex].ID == "Mob Arena" 
+            || Enemies[FightSelectIndex].ID == "Admin")
+        {
+            damage = 0;
+        }
         
-        _damageSFX.Play();
+        if (damage > 0)
+        {
+            Enemies[FightSelectIndex].Damage();
+            _damageSFX.Play();
+        }
+
         var damageLabel = Instantiate(Resources.Load<DamageIndicator>("Damage Indicator"));
         yield return damageLabel.Init(Enemies[FightSelectIndex], damage);
         yield return new WaitForSeconds(1);
@@ -979,27 +1323,32 @@ public sealed class BattleManager : MonoBehaviour
         
         _targetAnimator.gameObject.SetActive(false);
         _stickAnimator.gameObject.SetActive(false);
+        IsFight = false;
         
-        var isEveryoneNotActive = true;
-
-        foreach (var enemy in Enemies)
-        {
-            if (enemy.Health > 0)
-                isEveryoneNotActive = false;
-        }
+        EndTurn();
         
-        if (!isEveryoneNotActive)
-        {
-            EndTurn();
-        }
-        else
-        {
-            // StartCoroutine(AwaitExitMessage());
-        }
+        // var isEveryoneNotActive = true;
+        //
+        // foreach (var enemy in Enemies)
+        // {
+        //     if (enemy.Health > 0)
+        //         isEveryoneNotActive = false;
+        // }
+        //
+        // if (!isEveryoneNotActive)
+        // {
+        //     
+        // }
+        // else
+        // {
+        //     // StartCoroutine(AwaitExitMessage());
+        // }
     }
 
     private IEnumerator AwaitRunHeart()
     {
+        IsRunAnimation = true;
+        
         Destroy(_mercyLabel);
         Destroy(_runLabel);
         _runHeart.SetActive(true);
@@ -1011,9 +1360,10 @@ public sealed class BattleManager : MonoBehaviour
                 new Vector3(-6.5f, 0.06f), Time.deltaTime * 2);
             yield return null;
         }
+
+        yield return Enemies[0].AwaitRun();
         
-        // _runHeart.SetActive(false);
-        // _mercyScreen.gameObject.SetActive(false);
+        RollBackData();
         CoroutineRunner.Instance.StartCoroutine(AwaitExit());
     }
     
@@ -1032,7 +1382,9 @@ public sealed class BattleManager : MonoBehaviour
 
     private IEnumerator AwaitEndTurn()
     {
-        HideButtons();
+        if (ActIndex != 0)
+            HideButtons();
+        
         Heart.Instance.gameObject.SetActive(false);
 
         if (SelectScreenIndex == 3 && MercyIndex == 1)
@@ -1049,27 +1401,68 @@ public sealed class BattleManager : MonoBehaviour
         }
         else if (SelectScreenIndex == 1)
         {
-            WriteMessage(Enemies[ActSelectedIndex].Answers[ActIndex] + "RRRRRRRRRRRR RRRRRR");
-            yield return new WaitUntil(() => !MainText.IsWriting);
-            yield return InputManager.Instance.AwaitSubmitDownOrClick();
+            yield return MainText.AwaitWrite(Enemies[ActSelectedIndex].Answers[ActIndex]);
         }
-        else
+        else if (SelectScreenIndex == 3)
         {
-            WriteMessage("Вы использовали ФФФ");
-            yield return new WaitUntil(() => !MainText.IsWriting);
-            yield return InputManager.Instance.AwaitSubmitDownOrClick();
+            var isMercy = false;
+            
+            foreach (var enemy in Enemies)
+            {
+                if (enemy.Relationship > 0)
+                {
+                    isMercy = true;
+                }
+            }
+            
+            if (isMercy)
+            {
+                _mercySFX.Play();
+            }
+            else
+            {
+                yield return MainText.AwaitWrite(
+                    "Вы попытались использовать пощаду, но ник не <color=\"yellow\">ЖЕЛТЫЙ</color>.");
+            }
         }
+        // else
+        // {
+        //     WriteMessage("Вы использовали ФФФ");
+        //     yield return new WaitUntil(() => !MainText.IsWriting);
+        //     yield return InputManager.Instance.AwaitSubmitDownOrClick();
+        // }
         
         MainText.gameObject.SetActive(false);
         Heart.Instance.gameObject.SetActive(true);
+
+        if (SelectScreenIndex == 1 && ActIndex == 0)
+        {
+            SelectScreen(-1);
+            yield break;
+        }
+
+        Progress = 0;
         IsEnemyTurn = true;
     }
     
     public IEnumerator AwaitStartTurn()
     {
+        Turn++;
+        
+        ActSelectedIndex = 0;
+        FightSelectIndex = 0;
+        ActIndex = 0;
+        ItemsIndex = 0;
+        MercyIndex = 0;
+        
+        Heart.Instance.gameObject.SetActive(false);
+        MainText.Reset();
+        MainText.gameObject.SetActive(false);
+        
         if (MainIndex == 5)
             MainIndex = 1;
 
+        ProgressMultiply = 1;
         yield return AwaitSetFrame(new Vector2(7.177707f, 1.75f));
         SelectScreen(-1);
         yield return AwaitShowButtons();
@@ -1108,16 +1501,37 @@ public sealed class BattleManager : MonoBehaviour
     {
         const float SPEED = 6f;
         
-        while (_frame.size != size)
+        while (_frame.GetComponent<SpriteRenderer>().size != size)
         {
-            _frame.size = Vector2.MoveTowards(_frame.size, 
-                size, Time.deltaTime * SPEED);
+            _frame.SetFrame(Vector2.MoveTowards(_frame.GetComponent<SpriteRenderer>().size, 
+                size, Time.deltaTime * SPEED));
             yield return null;
         }
+    }
+
+    public void SetFrame(Vector2 size)
+    {
+        _frame.GetComponent<Frame>().SetFrame(size);
     }
     
     public IEnumerator AwaitExit()
     {
+        if (Stats.Instance.Data[32] == 2 
+            || (Stats.Instance.Data[33] == 2 
+                && Stats.Instance.Data[34] == 2 
+                && Stats.Instance.Data[35] == 2))
+        {
+            Stats.Instance.Data[2] = 1;
+        }
+
+        for (int i = 32; i < 36; i++)
+        {
+            if (Stats.Instance.Data[i] == 1)
+            {
+                Stats.Instance.Data[2] = 0;
+            }
+        }
+        
         _blackout.gameObject.SetActive(true);
         // _spareSFX.Play();
         Heart.Instance.GetComponent<SpriteRenderer>().sortingOrder = 1;
@@ -1132,11 +1546,10 @@ public sealed class BattleManager : MonoBehaviour
         
         yield return SceneManager.LoadSceneAsync("Overworld", LoadSceneMode.Additive);
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("Overworld"));
+        Player.Instance.transform.position = Stats.Instance.Position;
         SceneManager.LoadScene(Stats.Instance.LevelName, LoadSceneMode.Additive);
 
         yield return SceneManager.UnloadSceneAsync("Battle", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
-        
-        Player.Instance.transform.position = Stats.Instance.Position;
         Debug.Log("Перешли на другой уровень");
     }
     
@@ -1177,5 +1590,40 @@ public sealed class BattleManager : MonoBehaviour
         }
         
         return Enemies[0] == enemy;
+    }
+
+    public void RollBackData()
+    {
+        Stats.Instance.Items = StartItems;
+        Stats.Instance.MaxHP = StartMaxHP;
+
+        if (Enemies[0].ID == "Hacker")
+        {
+            Stats.Instance.Data[31] = 3;
+        }
+        else if (Enemies[0].ID == "Grum")
+        {
+            Stats.Instance.Data[32] = 3;
+        }
+        else if (Enemies[0].ID == "Herobrine")
+        {
+            Stats.Instance.Data[36] = 3;
+        }
+        else if (Enemies[0].ID == "Fivfiv")
+        {
+            Stats.Instance.Data[33] = 3;
+        }
+        else if (Enemies[0].ID == "Hero")
+        {
+            Stats.Instance.Data[37] = 3;
+        }
+    }
+
+    public void StartEnemyTurnTest()
+    {
+        IsEnemyTurn = true;
+        MainText.gameObject.SetActive(false);
+        HideButtons();
+        Heart.Instance.enabled = true;
     }
 }

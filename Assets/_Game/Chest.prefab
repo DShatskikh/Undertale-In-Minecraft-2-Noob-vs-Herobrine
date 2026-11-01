@@ -246,6 +246,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _id: Spawn(0, 0)
-  _item: Steack
+  _item: Steak
   _opened: {fileID: 4714410783012859700, guid: f9259702db390764c8b0c5159e4820a7, type: 3}
   _sfx: {fileID: 7338729069581396095}

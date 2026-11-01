@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Enemy : MonoBehaviour
@@ -7,8 +8,15 @@ public abstract class Enemy : MonoBehaviour
     public string Name;
     public List<string> Actions;
     public List<string> Answers;
-    public bool IsActive => true;
+    public bool IsActive = true;
     public int Health;
     public int MaxHealth;
     public int Relationship;
+
+    public virtual void Damage() { }
+
+    public virtual IEnumerator AwaitRun()
+    {
+        yield break;
+    }
 }

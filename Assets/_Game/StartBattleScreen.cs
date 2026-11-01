@@ -16,15 +16,15 @@ public sealed class StartBattleScreen : MonoBehaviour
     [SerializeField]
     private AudioSource _battleFallSFX;
     
-    public static void Transition(string enemyName)
+    public static void Transition(string enemyName, string enemyName2 = null, string enemyName3 = null)
     {
         var startBattleScreen = Instantiate(Resources.Load<StartBattleScreen>("StartBattleScreen"), 
             new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y), Quaternion.identity);
 
-        CoroutineRunner.Instance.StartCoroutine(startBattleScreen.AwaitTransition(enemyName));
+        CoroutineRunner.Instance.StartCoroutine(startBattleScreen.AwaitTransition(enemyName, enemyName2, enemyName3));
     }
     
-    private IEnumerator AwaitTransition(string enemyName)
+    private IEnumerator AwaitTransition(string enemyName, string enemyName2 = null, string enemyName3 = null)
     {
         Stats.Instance.Position = Player.Instance.transform.position;
         
@@ -66,10 +66,38 @@ public sealed class StartBattleScreen : MonoBehaviour
         yield return  SceneManager.LoadSceneAsync("Battle",  LoadSceneMode.Additive);
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("Battle"));
         yield return  SceneManager.UnloadSceneAsync("Overworld", UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
+        
         var enemy = Instantiate(Resources.Load<GameObject>(enemyName));
+        
         SceneManager.MoveGameObjectToScene(enemy, SceneManager.GetSceneByName("Battle"));
         
-        //var background = Instantiate(Resources.Load<GameObject>("Enemy Background"));
-        //SceneManager.MoveGameObjectToScene(background, SceneManager.GetSceneByName("Battle"));
+        if (enemyName2 != null)
+        {
+            var enemy2 = Instantiate(Resources.Load<GameObject>(enemyName2));
+            SceneManager.MoveGameObjectToScene(enemy2, SceneManager.GetSceneByName("Battle"));
+        }
+        
+        if (enemyName3 != null)
+        {
+            var enemy3 = Instantiate(Resources.Load<GameObject>(enemyName3));
+            SceneManager.MoveGameObjectToScene(enemy3, SceneManager.GetSceneByName("Battle"));
+        }
+
+        var backgroundName = "PVP Background";
+
+        if (enemyName == "Grum")
+        {
+            backgroundName = "PVP Background Inverted Variant";
+        }
+        else  if (enemyName == "Mob Arena")
+        {
+            backgroundName = "Mob Arena Background";
+        }
+
+        if (enemyName != "Arrow Enemy" && enemyName != "Hero")
+        {
+            var background = Instantiate(Resources.Load<GameObject>(backgroundName));
+            SceneManager.MoveGameObjectToScene(background, SceneManager.GetSceneByName("Battle"));
+        }
     }
 }

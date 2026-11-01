@@ -52,6 +52,7 @@ public sealed class SwitchingLevel : MonoBehaviour
         
         Stats.Instance.LevelName = sceneToLoad;
         Player.Instance.transform.position = position;
+        Player.Instance.enabled = true;
         
         while (blackout.color.a > 0)
         {
@@ -63,6 +64,41 @@ public sealed class SwitchingLevel : MonoBehaviour
         }
         
         Destroy(blackout.gameObject);
+    }
+
+    public static void SwitchingNotWorld()
+    {
+        CoroutineRunner.Instance.StartCoroutine(AwaitSwitchingNotWorld(Stats.Instance.LevelName, Stats.Instance.Position));
+    }
+    
+    public static void SwitchingNotWorld(string sceneToLoad, Vector3 position)
+    {
+        CoroutineRunner.Instance.StartCoroutine(AwaitSwitchingNotWorld(sceneToLoad, position));
+    }
+    
+    public static IEnumerator AwaitSwitchingNotWorld(string sceneToLoad, Vector3 position)
+    {
+        // var blackout = Instantiate(Resources.Load<SpriteRenderer>("Blackout"));
+        // DontDestroyOnLoad(blackout);
+        // blackout.color = Color.black;
+        // blackout.transform.position = new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y);
+        SceneManager.LoadScene("Overworld", LoadSceneMode.Single);
+        yield return null;
+        
+        Player.Instance.transform.position = position;
+        SceneManager.LoadScene(sceneToLoad, LoadSceneMode.Additive);
+        
         Player.Instance.enabled = true;
+        
+        // while (blackout.color.a > 0)
+        // {
+        //     yield return null;
+        //     var color = blackout.color;
+        //     color.a -= Time.deltaTime * 2;
+        //     blackout.color = color;
+        //     blackout.transform.position = new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y);
+        // }
+        //
+        // Destroy(blackout.gameObject);
     }
 }

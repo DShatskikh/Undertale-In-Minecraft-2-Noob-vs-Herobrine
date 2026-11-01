@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4850627297265664816}
   - component: {fileID: 6045896121615663568}
   - component: {fileID: 3556289832156390170}
+  - component: {fileID: 1826604806178947408}
   m_Layer: 0
   m_Name: Theatre
   m_TagString: Untagged
@@ -78,7 +79,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 7ff64db9694738e4380c950392a94167, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.45552552, g: 0.45552552, b: 0.45552552, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -134,3 +135,16 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.875, y: 0.44149327}
   m_EdgeRadius: 0
+--- !u!114 &1826604806178947408
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 359448472546702413}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71c926c8b6424483add8ed0a2e6bf90d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isNeed: 0

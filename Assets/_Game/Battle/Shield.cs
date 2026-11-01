@@ -19,15 +19,13 @@ public sealed class Shield : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D other)
     {
-        Debug.Log(other.name);
-        
-        if (!other.GetComponent<Shell>()) //  || !other.GetComponent<Shell>().CanDamage
+        if (!other.GetComponent<ShellBase>() || !other.GetComponent<ShellBase>().CanDamage || other.GetComponent<ShellBase>().Damage < 0) 
             return;
         
         if (_spriteRenderer.color.a < 0.5f)
         {
             _spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
-            BattleManager.Instance.Progress += 5;
+            BattleManager.Instance.Progress += other.GetComponent<ShellBase>().Progress;
             _sfx.Play();
         }
     }

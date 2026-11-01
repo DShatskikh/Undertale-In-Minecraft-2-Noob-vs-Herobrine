@@ -21,6 +21,8 @@ public sealed class PlateManager : MonoBehaviour
     private string _currentCode;
     private bool _isActivated;
     
+    public bool GetActivated => _isActivated;
+    
     public UnityEvent Event;
     
     private void Start()
@@ -45,7 +47,7 @@ public sealed class PlateManager : MonoBehaviour
         _currentCode += symbol;
     }
     
-    private void OnResetActivate(char symbol)
+    public void OnResetActivate(char symbol)
     {
         if (_currentCode == _answer)
         {
@@ -67,6 +69,8 @@ public sealed class PlateManager : MonoBehaviour
         }
         else
         {
+            _currentCode = null;
+            
             foreach (var plate in _plates)
             {
                 plate.Reset();

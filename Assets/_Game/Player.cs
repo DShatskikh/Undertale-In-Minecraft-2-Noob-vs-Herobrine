@@ -20,6 +20,9 @@ public sealed class Player : MonoBehaviour
 
     [SerializeField]
     private AudioSource _evilSFX;
+
+    [SerializeField]
+    private GameObject _sword, _stick;
     
     private Rigidbody2D _rigidbody;
     private Vector2 _previousPosition;
@@ -160,8 +163,21 @@ public sealed class Player : MonoBehaviour
 
     public IEnumerator WaitAttack()
     {
+        if (Stats.Instance.Data[6] == 1)
+        {
+            _sword.SetActive(false);
+            _stick.SetActive(true);
+        }
+        else
+        {
+            _sword.SetActive(true);
+            _stick.SetActive(false);
+        }
+        
         _view.GetComponent<Animator>().Play("Attack");
         yield return new WaitForSeconds(1);
-        _evilSFX.Play();
+        
+        if (Stats.Instance.Data[6] == 1)
+            _evilSFX.Play();
     }
 }

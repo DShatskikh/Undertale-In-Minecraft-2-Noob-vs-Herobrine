@@ -26,6 +26,11 @@ public sealed class Plate : MonoBehaviour
     {
         _view = GetComponent<SpriteRenderer>();
         _label.text = _symbol.ToString();
+
+        if (Stats.Instance.Data[7] == 1)
+        {
+            _label.text = "?";
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -35,10 +40,13 @@ public sealed class Plate : MonoBehaviour
         
         if (_isActivate)
             return;
-        
-        _sfx.Play();
-        OnActivate?.Invoke(_symbol);
-        Activate();
+
+        if (Stats.Instance.Data[7] == 0)
+        {
+            _sfx.Play();
+            OnActivate?.Invoke(_symbol);
+            Activate();
+        }
     }
 
     private void OnTriggerExit2D(Collider2D other)

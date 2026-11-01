@@ -1,0 +1,4 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Mobile%20Port/UI.uss?fileID=7433441132597879392&amp;guid=c1692c7d743ff924f807ad54c6637386&amp;type=3#UI" />
+    <ui:Label text="[Z]-Использовать&#10;[X]-Бег,перемотать диалог&#10;[Стрелочки] или [WASD]-Ходить" name="Label" picking-mode="Ignore" style="-unity-font-definition: url(&quot;project://database/Assets/_Game/UndertaleFonts.otf?fileID=12800000&amp;guid=a9d9aa734e91e2f4a966ad7d4681ab55&amp;type=3#UndertaleFonts&quot;); top: 98px; right: 0; position: absolute; color: rgb(255, 255, 255); font-size: 50px; -unity-font-style: bold;" />
+</ui:UXML>

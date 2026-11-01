@@ -146,6 +146,50 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Grum_2
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 8
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd5bd270c2d80d146918fcc956347cd0
+      internalID: -947593733
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Grum_3
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 8
+        width: 4
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a3537baeb6c9f06478579cabce2516e1
+      internalID: -1193689034
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -162,6 +206,8 @@ TextureImporter:
     nameFileIdTable:
       Grum_0: -1437589173795903170
       Grum_1: 2246585298597520796
+      Grum_2: -947593733
+      Grum_3: -1193689034
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

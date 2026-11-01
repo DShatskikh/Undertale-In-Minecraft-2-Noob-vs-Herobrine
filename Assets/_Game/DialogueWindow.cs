@@ -12,9 +12,12 @@ public class DialogueWindow : MonoBehaviour
     
     [SerializeField]
     private TypewriterComponent _label;
-
+    
     [SerializeField]
     private TypewriterComponent _dialogueLabel;
+
+    [SerializeField]
+    private Animator _animator;
     
     [SerializeField]
     private GameObject[] _speakers;
@@ -24,6 +27,10 @@ public class DialogueWindow : MonoBehaviour
      * 1 - Normal
      * 2 - Noobik
      * 3 - Herobrine
+     * 4 - Squid Boss
+     * 5 - Palisos
+     * 6 - Grox
+     * 7 - Girl Voice
      */
     [SerializeField]
     private AudioClip[] _clips;
@@ -48,7 +55,7 @@ public class DialogueWindow : MonoBehaviour
 
     private void Update()
     {
-        if (InputManager.Instance.IsCancelDown)
+        if (InputManager.Instance.IsCancelDown) //  || Input.GetMouseButtonDown(0)
             _isSkip = true;
     }
 
@@ -59,16 +66,19 @@ public class DialogueWindow : MonoBehaviour
         
         foreach (var replica in _replicas)
         {
+            _isSkip = false;
             var currentReplica = replica;
             var isDialogue = false;
             _sfx.clip = _clips[0];
             
             if (replica[0] == '/')
             {
+                _animator.Play("Head Container", 0, 0f);
+                
                 isDialogue = true;
                 _sfx.clip = _clips[1];
                 
-                if (replica[1] == 'h')
+                if (replica[1] == 'h') // Hacker
                 {
                     if (replica[2] == '0')
                     {
@@ -76,7 +86,7 @@ public class DialogueWindow : MonoBehaviour
                     }
                 }
                 
-                if (replica[1] == 'n')
+                if (replica[1] == 'n') // Noobik
                 {
                     if (replica[2] == '0')
                     {
@@ -128,6 +138,162 @@ public class DialogueWindow : MonoBehaviour
                     }
                 }
                 
+                if (replica[1] == 'g') // Grum
+                {
+                    if (replica[2] == '0')
+                    {
+                        _speakers[7].SetActive(true);
+                    }
+                    
+                    if (replica[2] == '1')
+                    {
+                        _speakers[13].SetActive(true);
+                    }
+                }
+                
+                if (replica[1] == 'i') // Fivfiv
+                {
+                    if (replica[2] == '0')
+                    {
+                        _speakers[8].SetActive(true);
+                    }
+                }
+                
+                if (replica[1] == 'a') // Admin
+                {
+                    if (replica[2] == '0')
+                    {
+                        _speakers[9].SetActive(true);
+                    }
+                }
+                
+                if (replica[1] == 'e') // Hero
+                {
+                    if (replica[2] == '0')
+                    {
+                        _speakers[10].SetActive(true);
+                    }
+                }
+                
+                if (replica[1] == 's') // Squid Boss
+                {
+                    if (replica[2] == '0')
+                    {
+                        _speakers[11].SetActive(true);
+                        _sfx.clip = _clips[4];
+                    }
+                }
+                
+                if (replica[1] == 'p') // Palisos
+                {
+                    if (replica[2] == '0')
+                    {
+                        _speakers[12].SetActive(true);
+                        _sfx.clip = _clips[5];
+                    }
+                }
+                
+                if (replica[1] == 'k') // Skeleton
+                {
+                    if (replica[2] == '0')
+                    {
+                        _speakers[14].SetActive(true);
+                    }
+                }
+                
+                if (replica[1] == 'z') // enderman
+                {
+                    if (replica[2] == '0')
+                    {
+                        _speakers[15].SetActive(true);
+                    }
+                }
+                
+                if (replica[1] == 'v') // villager
+                {
+                    if (replica[2] == '0')
+                    {
+                        _speakers[16].SetActive(true);
+                    }
+                }
+                
+                if (replica[1] == 'q') // witch
+                {
+                    if (replica[2] == '0')
+                    {
+                        _speakers[17].SetActive(true);
+                    }
+                }
+                
+                if (replica[1] == 'w') // wisman
+                {
+                    if (replica[2] == '0')
+                    {
+                        _speakers[18].SetActive(true);
+                        _sfx.clip = _clips[6];
+                    }
+                }
+                
+                if (replica[1] == 'j') // nastya
+                {
+                    if (replica[2] == '0')
+                    {
+                        _speakers[19].SetActive(true);
+                        _sfx.clip = _clips[7];
+                    }
+                    else if (replica[2] == '1')
+                    {
+                        _speakers[20].SetActive(true);
+                        _sfx.clip = _clips[7];
+                    }
+                }
+                
+                if (replica[1] == 'd') // dog
+                {
+                    _sfx.clip = null;
+                    
+                    if (replica[2] == '0')
+                    {
+                        _speakers[21].SetActive(true);
+                    }
+                    else if (replica[2] == '1')
+                    {
+                        _speakers[22].SetActive(true);
+                    }
+                }
+                
+                if (replica[1] == 'l') // snow
+                {
+                    _sfx.clip = null;
+                    
+                    if (replica[2] == '0')
+                    {
+                        _speakers[23].SetActive(true);
+                    }
+                    else if (replica[2] == '1')
+                    {
+                        _speakers[24].SetActive(true);
+                    }
+                }
+                
+                if (replica[1] == 'u') // slime
+                {
+                    _sfx.clip = null;
+                    
+                    if (replica[2] == '0') // mini
+                    {
+                        _speakers[25].SetActive(true);
+                    }
+                }
+                
+                if (replica[1] == 'o') // sheep
+                {
+                    if (replica[2] == '0')
+                    {
+                        _speakers[26].SetActive(true);
+                    }
+                }
+                
                 currentReplica = replica.Substring(3);
             }
 
@@ -153,17 +319,21 @@ public class DialogueWindow : MonoBehaviour
                 if (i != 0)
                 {
                     var previousLabel = _currentLabel;
-                    _currentLabel = Instantiate(previousLabel, transform);
+                    
+                    _currentLabel = Instantiate(Resources.Load<TypewriterComponent>(
+                        isDialogue ? "Dialogue Label" : "Monologue Label"), transform);
                     createdLabels.Add(_currentLabel);
-                    var textMesh = _currentLabel.GetComponentInChildren<TextMeshPro>();
+                    var textMesh = previousLabel.GetComponentInChildren<TextMeshPro>();
 
                     _currentLabel.transform.position = new Vector3(previousLabel.transform.position.x,
                         previousLabel.transform.position.y - textMesh.renderedHeight,
                         previousLabel.transform.position.z); // -1
 
-                    textMesh.text = string.Empty;
+                    _currentLabel.GetComponentInChildren<TextMeshPro>().text = string.Empty;
                 }
 
+                _currentLabel.StopShowingText();
+                _currentLabel.ShowText(null);
                 _currentLabel.ShowText(part);
                 _currentLabel.StartShowingText();
                 _currentLabel.onCharacterVisible.AddListener(OnWrite);
@@ -176,20 +346,20 @@ public class DialogueWindow : MonoBehaviour
                 if (_isSkip)
                     _currentLabel.SkipTypewriter();
 
-                var timer = 0.25f;
-
-                while (timer > 0)
-                {
-                    timer -= Time.deltaTime;
-
-                    if (!_isSkip)
-                        yield return null;
-                }
+                // var timer = 0.25f;
+                //
+                // while (timer > 0)
+                // {
+                //     timer -= Time.deltaTime;
+                //
+                //     if (!_isSkip)
+                //         yield return null;
+                // }
             }
 
             _isSkip = false;
             yield return null;
-            yield return new WaitUntil(() => InputManager.Instance.IsSubmitDown);
+            yield return InputManager.Instance.AwaitSubmitDownOrClick();
             
             //_label.ShowText(replica);
             //_label.StartShowingText();
@@ -215,6 +385,11 @@ public class DialogueWindow : MonoBehaviour
 
     private void OnWrite(CharacterData arg0)
     {
+        var character = arg0.info.character;
+        
+        if (character == ' ' || character == '.' || character == ',')
+            return;
+        
         if (!_sfx.isPlaying)
             _sfx.Play();
     }

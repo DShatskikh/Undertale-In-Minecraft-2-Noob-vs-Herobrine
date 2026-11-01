@@ -34,12 +34,44 @@ public sealed class Chest : Usable
         if (_isOpened)
             yield break;
         
-        _view.sprite = _opened;
-        _sfx.Play();
         Player.Instance.enabled = false;
-        yield return DialogueWindow.StartDialogue(new[] { "Вы открыли сундук", "Вы получили Стейк" }, false);
+
+        if (Stats.Instance.Data[7] == 1)
+        {
+            yield return DialogueWindow.StartDialogue(new[] { "(Ничего не произошло.)" }, false);
+        }
+        else
+        {
+            if (Stats.Instance.TryAddItem(_item))
+            {
+                _view.sprite = _opened;
+                _sfx.Play();
+            
+                var itemName = _item switch
+                {
+                    "Steak" => "Стейк",
+                    "Potion" => "Зелье лечения",
+                    "GoldApple" => "Золотое яблоко",
+                    _ => "Что-то...",
+                };
+            
+                yield return DialogueWindow.StartDialogue(new[]
+                {
+                    $"(Вы получили <color=yellow>{itemName}</color>.)"
+                }, false);
+            
+                Stats.Instance.Chests.Add(_id);
+                _isOpened = true;  
+            }
+            else
+            {
+                yield return DialogueWindow.StartDialogue(new[]
+                {
+                    "(У вас нету места.)"
+                }, false);
+            }
+        }
+        
         Player.Instance.enabled = true;
-        Stats.Instance.Chests.Add(_id);
-        _isOpened = true;
     }
 }

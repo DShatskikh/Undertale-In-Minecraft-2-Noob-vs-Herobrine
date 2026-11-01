@@ -34,7 +34,7 @@ public abstract class BannedUsable : Usable
         
         bool isEnd = true;
         
-        for (int i = 11; i < 15; i++)
+        for (int i = 11; i <= 21; i++)
         {
             if (Stats.Instance.Data[i] != 1)
             {
@@ -44,17 +44,27 @@ public abstract class BannedUsable : Usable
 
         if (isEnd)
         {
-            Stats.Instance.Data[7] = 1;
-            FindAnyObjectByType<BlackAndWhiteWorld>().Activate();
-            
-            yield return new WaitForSeconds(1);
-
-            yield return DialogueWindow.StartDialogue(new []
-            {
-                "Поздравляю! У тебя получилось попасть туда куда нельзя попасть.",
-                "Я буду ждать тебя за деревом."
-            }, false);
+            CoroutineRunner.Instance.StartCoroutine(AwaitEnd());
         }
+        else
+        {
+            Player.Instance.enabled = true;
+        }
+    }
+
+    private IEnumerator AwaitEnd()
+    {
+        Stats.Instance.Data[7] = 1;
+        FindAnyObjectByType<BlackAndWhiteWorld>()?.Activate();
+        MusicManager.Instance.Play(Resources.Load<AudioClip>("DELTARUNE OST — man"));
+            
+        yield return new WaitForSeconds(1);
+
+        yield return DialogueWindow.StartDialogue(new []
+        {
+            "Поздравляю! У тебя получилось попасть куда-то.",
+            "Я жду тебя за деревом."
+        }, false);
         
         Player.Instance.enabled = true;
     }

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public sealed class DeveloperTree : Usable
 {
@@ -21,6 +22,33 @@ public sealed class DeveloperTree : Usable
         {
             Player.Instance.enabled = false;
 
+            if (Stats.Instance.Data[55] == 1)
+            {
+                yield return SelectWindow.StartSelect("Уже всё?", "Да", "Нет");
+
+                if (!SelectWindow.IsRight)
+                {
+                    yield return DialogueWindow.StartDialogue(new []
+                    {
+                        "Хорошо.",
+                        "Тогда тогда тебе пора."
+                    }, false);
+
+                    Meta.Instance.IsEndEvil = true;
+                    Stats.Instance.Reset();
+                    SceneManager.LoadScene("Menu");
+                }
+                else
+                {
+                    yield return DialogueWindow.StartDialogue(new []
+                    {
+                        "Я тебя подожду."
+                    }, false);
+                }
+                
+                yield break;
+            }
+            
             yield return DialogueWindow.StartDialogue(new []
             {
                 "У тебя есть что-то для меня?",
@@ -31,13 +59,13 @@ public sealed class DeveloperTree : Usable
             
             yield return DialogueWindow.StartDialogue(new []
             {
-                "(Вы потеряли <Color=\"yellow\">Сломанный плакат</Color>.)",
+                "(Вы потеряли <Color=\"yellow\">Забагованный билет</Color>.)",
                 "Хм...",
                 "Наверное это какая-то ошибка.",
-                "Я его починил.",
-                "Секунду.",
+                "Тут написанна какая-то бесмыслица.",
+                "Секундочку.",
                 "...",
-                "Держи.",
+                "Вот.*Я его починил.*Держи.",
             }, false);
             
             _give.Play();
@@ -47,14 +75,10 @@ public sealed class DeveloperTree : Usable
                 "(Вы получили <Color=\"yellow\">Изначальный плакат</Color>.)",
                 "Пройди игру еще раз и увидишь <Color=\"yellow\">Истинную концовку</Color>.",
                 "Теперь история в твоих руках.",
-                "Если захочешь завершить игру просто поговори со мной.",
+                "Если захочешь завершить игру просто поговори со мной снова.",
             }, false);
-            
-            // foreach (SpriteRenderer spriteRenderer in _spriteRenderers)
-            // {
-            //     spriteRenderer.material = _material;
-            // }
-            
+
+            Stats.Instance.Data[55] = 1;
             Player.Instance.enabled = true;
         }
         else

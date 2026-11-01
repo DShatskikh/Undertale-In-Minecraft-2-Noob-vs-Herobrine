@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Delays By Word
   m_EditorClassIdentifier: Febucci.TextAnimator.Runtime::Febucci.TextAnimatorForUnity.TypewriterByWord
   waitForNormalWord: 0.3
-  waitForWordWithPunctuation: 0.5
-  disappearanceDelay: 0.5
+  waitForWordWithPunctuation: 0.3
+  disappearanceDelay: 0.3

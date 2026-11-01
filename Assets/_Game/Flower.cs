@@ -2,6 +2,9 @@ using UnityEngine;
 
 public sealed class Flower : MonoBehaviour
 {
+    [SerializeField]
+    private float _force = 4;
+    
     private float _speed = 0.25f;
     private float _intensivity = 1f;
     
@@ -9,7 +12,7 @@ public sealed class Flower : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            _intensivity = 4;
+            _intensivity = _force;
             GetComponent<SpriteRenderer>().material.SetFloat("_WindIntensivity", _intensivity);
         }
     }
