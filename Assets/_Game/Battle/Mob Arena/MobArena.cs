@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -18,6 +17,9 @@ public sealed class MobArena : Enemy
     [SerializeField]
     private AttacksPool[] _attacks;
 
+    [SerializeField]
+    private AudioSource _addMoneySFX;
+    
     private int _money;
     
     private IEnumerator Start()
@@ -49,6 +51,9 @@ public sealed class MobArena : Enemy
             yield return BattleManager.Instance.AwaitStartTurn();
             var isRun = false;
             
+            if (_view.GetCurrentAnimatorStateInfo(0).IsName("Run"))
+                _view.Play("Return"); 
+            
             while (!BattleManager.Instance.IsEnemyTurn)
             {
                 yield return null;
@@ -71,6 +76,11 @@ public sealed class MobArena : Enemy
             }
             
             Heart.Instance.gameObject.SetActive(false);
+
+            if (BattleManager.Instance.SelectScreenIndex == 1 && BattleManager.Instance.ActIndex == 1)
+            {
+                AddMoney(1);
+            }
             
             yield return EnemyMessageBox.AwaitWriting(new Vector2(3.18000007f, 1.63f), 
                 "Защищайся.");
@@ -94,5 +104,11 @@ public sealed class MobArena : Enemy
         }
         
         _moneyLabel.text = $"Рекорд {Meta.Instance.RecordMoney}$\nТекущий {_money}$";
+    }
+
+    public void AddMoney(int amount)
+    {
+        _money += amount;
+        _addMoneySFX.Play();
     }
 }

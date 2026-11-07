@@ -37,7 +37,7 @@ public class Bootstrap : MonoBehaviour
         Stats.Instance = Stats.GetDefault();
         Meta.Instance = Meta.GetDefault();
         Player.IsLoad = true;
-        Stats.Instance.LevelName = "Home";
+        // Stats.Instance.LevelName = "Home";
 
         // SceneManager.LoadScene("ScreenSaver", LoadSceneMode.Single);
 
@@ -72,19 +72,21 @@ public class Bootstrap : MonoBehaviour
         // Stats.Instance.Data[33] = 1;
         // Stats.Instance.Data[34] = 1;
         // Stats.Instance.Data[35] = 1;
+        // Stats.Instance.Data[6] = 1;
+        // Stats.Instance.Data[7] = 1;
         
         // Meta.Instance.IsEndEvil = true;
         // Meta.Instance.IsEndOldSpawn = true;
         // Meta.Instance.IsEndPacifist = true;
         
         // Stats.Instance.Position = new Vector3(0f, -1.5f, 0);
-        // Stats.Instance.LevelName = "Home"; // Spawn (-1, 0)
+        // Stats.Instance.LevelName = "Castle 2"; // Spawn (-1, 0)
         // SwitchingLevel.SwitchingNotWorld(Stats.Instance.LevelName, Stats.Instance.Position);
         
-        SceneManager.LoadScene("Battle", LoadSceneMode.Single);
+        // SceneManager.LoadScene("Battle", LoadSceneMode.Single);
 
         // SceneManager.LoadScene("GameOver", LoadSceneMode.Single);
-        // SceneManager.LoadScene("Intro", LoadSceneMode.Single);
+        SceneManager.LoadScene("Intro", LoadSceneMode.Single);
         // SceneManager.LoadScene("Menu", LoadSceneMode.Single);
         // SceneManager.LoadScene("Outro 1", LoadSceneMode.Single);
 

@@ -28,6 +28,7 @@ public sealed class BattleMainText : MonoBehaviour
 
     public void Write(string message)
     {
+        gameObject.SetActive(true);
         _label.StopShowingText();
         _label.ShowText("");
         gameObject.SetActive(true);

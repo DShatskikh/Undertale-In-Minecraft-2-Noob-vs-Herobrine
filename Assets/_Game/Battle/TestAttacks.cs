@@ -5,7 +5,7 @@ using UnityEngine;
 public sealed class TestAttacks : Enemy
 {
     [SerializeField]
-    private AttacksPool[] _attacks;
+    private ShellSpawner _attack;
 
     private IEnumerator Start()
     {
@@ -16,10 +16,13 @@ public sealed class TestAttacks : Enemy
         BattleManager.Instance.HideButtons(true);
         BattleManager.Instance.MainText.gameObject.SetActive(false);
         Heart.Instance.gameObject.SetActive(true);
-        Heart.Instance.enabled = true;
+        
+        yield return null;
 
-        yield return _attacks[0].AwaitProcess();
-        // _spawners[0].Timer
+        Heart.Instance.enabled = true;
+        var attack = Instantiate(_attack);
+        attack.gameObject.SetActive(true);
+        attack.transform.localScale = Vector3.one;
         
         yield break;
     }

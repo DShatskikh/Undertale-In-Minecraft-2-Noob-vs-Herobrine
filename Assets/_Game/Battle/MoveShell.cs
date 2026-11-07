@@ -13,4 +13,14 @@ public sealed class MoveShell : MonoBehaviour
     {
         transform.position += (Vector3)_direction * _speed * Time.deltaTime;
     }
+
+    public void SetDirection(Vector2 direction)
+    {
+        _direction = direction;
+    }
+    
+    public void SetSpeed(float speed)
+    {
+        _speed = speed;
+    }
 }

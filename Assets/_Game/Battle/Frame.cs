@@ -6,7 +6,7 @@ public sealed class Frame : MonoBehaviour
     private BoxCollider2D _up, _down, _left, _right;
 
     [SerializeField]
-    private SpriteRenderer _spriteRenderer;
+    private SpriteRenderer _spriteRenderer, _frame;
 
     private void Update()
     {
@@ -16,19 +16,20 @@ public sealed class Frame : MonoBehaviour
     public void SetFrame(Vector2 size)
     {
         _spriteRenderer.size = size;
-        transform.position = transform.position.SetY(_spriteRenderer.size.y - 3.75f);
+        _frame.size = size;
+        transform.position = transform.position.SetY(size.y - 3.75f);
         
-        _right.transform.localPosition = new Vector3(_spriteRenderer.size.x / 2, 0);
-        _right.transform.localScale = new Vector3(0.15f, _spriteRenderer.size.y);
+        _right.transform.localPosition = new Vector3(size.x / 2, 0);
+        _right.transform.localScale = new Vector3(0.15f, size.y);
         
-        _left.transform.localPosition = new Vector3(-_spriteRenderer.size.x / 2, 0);
-        _left.transform.localScale = new Vector3(0.15f, _spriteRenderer.size.y);
+        _left.transform.localPosition = new Vector3(-size.x / 2, 0);
+        _left.transform.localScale = new Vector3(0.15f, size.y);
         
-        _up.transform.localPosition = new Vector3(0, _spriteRenderer.size.y / 2);
-        _up.transform.localScale = new Vector3(_spriteRenderer.size.x, 0.1f); // 1.75f
+        _up.transform.localPosition = new Vector3(0, size.y / 2);
+        _up.transform.localScale = new Vector3(size.x, 0.1f); // 1.75f
         
-        _down.transform.localPosition = new Vector3(0, -_spriteRenderer.size.y / 2);
-        _down.transform.localScale = new Vector3(_spriteRenderer.size.x, 0.175f);
+        _down.transform.localPosition = new Vector3(0, -size.y / 2);
+        _down.transform.localScale = new Vector3(size.x, 0.175f);
     }
 
     [ContextMenu("ToDown")]

@@ -31,7 +31,7 @@ public sealed class InputManager : MonoBehaviour
 
     private void Update()
     {
-#if PLATFORM_STANDALONE
+#if PLATFORM_STANDALONE || PLATFORM_WEBGL
         IsSubmitDown = Input.GetButtonDown("Submit");
         IsSubmit = Input.GetButton("Submit");
         IsSubmitUp = Input.GetButtonUp("Submit");

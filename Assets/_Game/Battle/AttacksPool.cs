@@ -8,6 +8,9 @@ public sealed class AttacksPool : MonoBehaviour
     private bool _isStartRandom = true;
     
     [SerializeField]
+    private bool _isAbsoluteRandom;
+    
+    [SerializeField]
     private bool _isEnd;
     
     [SerializeField]
@@ -47,6 +50,11 @@ public sealed class AttacksPool : MonoBehaviour
                 i = 0;
             }
 
+            if (_isAbsoluteRandom)
+            {
+                i = Random.Range(0, _attacks.Length);
+            }
+            
             if (!isFirst)
                 yield return AwaitTransition(_attacks[i]);
             
@@ -62,7 +70,9 @@ public sealed class AttacksPool : MonoBehaviour
             
             Destroy(attack.gameObject);
             isFirst = false;
-            i++;
+            
+            if (!_isAbsoluteRandom)
+                i++;
 
             if (_isEnd && i == _attacks.Length)
             {

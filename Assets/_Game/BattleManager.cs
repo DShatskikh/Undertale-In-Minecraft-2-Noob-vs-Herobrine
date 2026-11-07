@@ -498,10 +498,18 @@ public sealed class BattleManager : MonoBehaviour
                         ItemsIndex = 1;
                         _squeakSFX.Play();
                     }
-                    else if (ItemsIndex == 1 && allItems.Length > 4)
+                    else if (ItemsIndex == 1)
                     {
-                        ItemsIndex = 4;
-                        IsKarmaniPage_2 = true;
+                        if (allItems.Length > 4)
+                        {
+                            ItemsIndex = 4;
+                            IsKarmaniPage_2 = true;
+                        }
+                        else
+                        {
+                            ItemsIndex = 0;
+                        }
+                        
                         _squeakSFX.Play();
                     }
                     else if (ItemsIndex == 2 && allItems.Length > 3)
@@ -549,18 +557,23 @@ public sealed class BattleManager : MonoBehaviour
                 }
                 else if (InputManager.Instance.Horizontal < 0)
                 {
-                    if (ItemsIndex == 0 && allItems.Length > 4)
+                    if (ItemsIndex == 0)
                     {
                         if (allItems.Length > 5)
                         {
                             ItemsIndex = 5;  
+                            IsKarmaniPage_2 = true;
+                        }
+                        else if (allItems.Length > 4)
+                        {
+                            ItemsIndex = 4;
+                            IsKarmaniPage_2 = true;
                         }
                         else
                         {
-                            ItemsIndex = 4;
+                            ItemsIndex = 1;  
                         }
                         
-                        IsKarmaniPage_2 = true;
                         _squeakSFX.Play();
                     }
                     else if (ItemsIndex == 1)
@@ -1456,7 +1469,10 @@ public sealed class BattleManager : MonoBehaviour
         MercyIndex = 0;
         
         Heart.Instance.gameObject.SetActive(false);
-        MainText.Reset();
+        
+        if (MainText.gameObject.activeSelf)
+            MainText.Reset();
+        
         MainText.gameObject.SetActive(false);
         
         if (MainIndex == 5)

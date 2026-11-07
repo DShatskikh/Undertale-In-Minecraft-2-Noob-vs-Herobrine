@@ -4,7 +4,7 @@ public sealed class Shield : MonoBehaviour
 {
     [SerializeField]
     private AudioSource _sfx;
-    
+
     private SpriteRenderer _spriteRenderer;
 
     private void Awake()
@@ -20,6 +20,9 @@ public sealed class Shield : MonoBehaviour
     private void OnTriggerStay2D(Collider2D other)
     {
         if (!other.GetComponent<ShellBase>() || !other.GetComponent<ShellBase>().CanDamage || other.GetComponent<ShellBase>().Damage < 0) 
+            return;
+
+        if (Heart.Instance.IsInclusible)
             return;
         
         if (_spriteRenderer.color.a < 0.5f)

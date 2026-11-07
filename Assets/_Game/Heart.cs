@@ -37,6 +37,7 @@ public sealed class Heart : MonoBehaviour
     public float VSpeed = 0f;
     public float HSpeed = 0f;
     public Vector2 GravityDirection = Vector2.down;
+    public bool IsInclusible => _damageTimer > 0;
 
     private void OnEnable()
     {
